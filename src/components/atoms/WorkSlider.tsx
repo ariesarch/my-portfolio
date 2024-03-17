@@ -6,29 +6,32 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
-
+import { SelectedProject,SetSelectedProject } from "@/utils/constants";
 const workSlides = {
     slides: [
         {
             images: [
                 {
-                    title: "title",
-                    path: "/thumb1.jpg",
+                    title: "Newsmast",
+                    path: "/newsmast-pwa.jpeg",
+                    description: [
+                        "A decentralized social media platrorm."
+                    ],
                     link: "http://example.com",
                 },
                 {
-                    title: "title",
-                    path: "/thumb2.jpg",
+                    title: "SAYA",
+                    path: "/saya-web.jpeg",
                     link: "http://example.com",
                 },
                 {
-                    title: "title",
-                    path: "/thumb3.jpg",
+                    title: "SBN",
+                    path: "/sbn-web.jpeg",
                     link: "http://example.com",
                 },
                 {
-                    title: "title",
-                    path: "/thumb4.jpg",
+                    title: "PSS",
+                    path: "/pss-web.jpeg",
                     link: "http://example.com",
                 },
             ],
@@ -60,7 +63,14 @@ const workSlides = {
     ],
 };
 
-const WorkSlider = () => {
+interface WorkSliderProps {
+    selectedPrj: SelectedProject;
+    setSelectedProject: SetSelectedProject
+}
+const WorkSlider: React.FC<WorkSliderProps> = ({ selectedPrj, setSelectedProject }) => {
+    const handleImageHover = (image: SelectedProject) => {
+        setSelectedProject(image);
+    };
     return (
         <Swiper
             spaceBetween={10}
@@ -68,24 +78,28 @@ const WorkSlider = () => {
                 clickable: true,
             }}
             modules={[Pagination]}
-            className="h-[280px] sm:h-[480px]"
         >
             {workSlides.slides.map((slide, i) => (
                 <SwiperSlide key={i}>
-                    <div className="grid grid-cols-2 grid-rows-2 gap-4">
+                    <div className="grid grid-cols-2 grid-rows-2 gap-2 max-h-[540px]">
                         {slide.images.map((image, imageI) => (
                             <div
-                                className="relative rounded-lg overflow-hidden flex items-center justify-center group"
+                                className=" relative rounded-lg overflow-hidden flex items-center justify-center group"
                                 key={imageI}
+                                onMouseEnter={() => handleImageHover(image)}
                             >
                                 <div className="flex items-center justify-center relative overflow-hidden group">
                                     {/* image */}
-                                    <Image
-                                        src={image.path}
-                                        alt={image.title}
-                                        width={500}
-                                        height={300}
-                                    />
+                                    <div className="object-cover ">
+                                        <Image
+                                            src={image.path}
+                                            alt={image.title}
+                                            width={500}
+                                            height={300}
+                                            className="block w-full"
+                                        />
+                                    </div>
+
 
                                     {/* overlay gradient */}
                                     <div

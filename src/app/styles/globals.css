@@ -20,7 +20,10 @@
 .swiper-rtl .swiper-button-prev:after {
   color: #f13024;
 }
-
+.swiper-pagination{
+  margin-top: 10px !important;
+  position: relative !important;
+}
 @layer base {
   body {
     @apply bg-primary overflow-hidden leading-relaxed;

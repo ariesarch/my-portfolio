@@ -4,11 +4,12 @@ import Nav from "@/components/atoms/Nav";
 import Header from "@/components/atoms/Header";
 import Layout from "@/components/Layout";
 import { AnimatePresence, motion } from "framer-motion";
-import Transition from "@/components/Transition";
+import TransitionComponent from "@/components/TransitionComponent";
 import { usePathname } from "next/navigation";
 import { useContext, useRef } from "react";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import TopLeftImg from "@/components/atoms/TopLeftImg";
+import Head from "next/head";
+import Transition from "./Transition";
 function FrozenRouter(props: { children: React.ReactNode }) {
   const context = useContext(LayoutRouterContext ?? {});
   const frozen = useRef(context).current;
@@ -31,8 +32,7 @@ export default function RootLayout({
         <main
           className={`page bg-site text-white bg-cover bg-no-repeat relative`}
         >
-          {/* metadata */}
-          <div>
+          <Head>
             <title>Ethan Smith | Portfolio</title>
             <meta
               name="description"
@@ -44,18 +44,23 @@ export default function RootLayout({
             />
             <meta name="author" content="Sanidhya Kumar Verma" />
             <meta name="theme-color" content="#f13024" />
-          </div>
+            </Head>
           <Nav />
           <Header />
-          <TopLeftImg/>
-          <AnimatePresence mode="wait">
-            <motion.div className="h-full" key={key}>
-              <Transition/>
+          {/* <TopLeftImg/> */}
+          <div className=" bg-primary/30 py-32 text-center xl:text-left">
+            <div className="w-full container mx-auto">
+            {/* <AnimatePresence>
+              <motion.div key={key}> */}
+                <Transition>{children}</Transition>
+                {/* <Transition/>
               <FrozenRouter>
                 {children}
-              </FrozenRouter>
-            </motion.div>
-          </AnimatePresence>
+              </FrozenRouter> */}
+              {/* </motion.div>
+            </AnimatePresence> */}
+          </div>
+          </div>
         </main>
       </body>
     </html>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const Transition = () => {
+const TransitionComponent = () => {
     const transitionVariants = {
         initial: {
             x: "100%",
@@ -52,4 +52,4 @@ const Transition = () => {
     );
 };
 
-export default Transition;
+export default TransitionComponent;
