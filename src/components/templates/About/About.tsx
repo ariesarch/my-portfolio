@@ -4,7 +4,6 @@ import { fadeIn } from '@/utils/variants'
 import { useState } from 'react';
 import {
     FaCss3,
-    FaFigma,
     FaHtml5,
     FaBootstrap,
     FaJs,
@@ -16,8 +15,6 @@ import {
 } from "react-icons/fa";
 import {
     SiTailwindcss,
-    SiAdobephotoshop,
-    SiAdobexd,
     SiNextdotjs,
     SiNuxtdotjs,
     SiVuetify,
@@ -35,10 +32,21 @@ import {
     SiMongodb
 } from "react-icons/si";
 import CountUp from 'react-countup';
-import Avatar from '@/components/atoms/Avatar';
-import Circles from '@/components/atoms/Circles';
+import { IconType } from 'react-icons';
+interface ExperienceItem {
+    title?: string;
+    stage?: string;
+    icons?: IconType[];
+}
+
+// Define the types for the about data
+interface AboutDataItem {
+    title: string;
+    info: ExperienceItem[];
+}
+
 //  data
-export const aboutData = [
+export const aboutData:AboutDataItem[] = [
     {
         title: "Experiences",
         info: [
