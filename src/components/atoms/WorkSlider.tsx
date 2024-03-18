@@ -17,22 +17,22 @@ const workSlides = {
                     description: [
                         "A decentralized social media platrorm."
                     ],
-                    link: "http://example.com",
+                    link: "https://newsmast.org/",
                 },
                 {
-                    title: "SAYA",
+                    title: "SAYA English Learning Platform",
                     path: "/saya-web.jpeg",
-                    link: "http://example.com",
+                    link: "https://saya.education/",
                 },
                 {
                     title: "SBN",
                     path: "/sbn-web.jpeg",
-                    link: "http://example.com",
+                    link: "https://sunbusinessmyanmar.org/",
                 },
                 {
                     title: "PSS",
                     path: "/pss-web.jpeg",
-                    link: "http://example.com",
+                    link: "https://www.pyaesoneshin.com/",
                 },
             ],
         },
