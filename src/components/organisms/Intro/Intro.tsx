@@ -112,7 +112,7 @@ export const Intro = () => {
         <Canvas camera={{ position: [-5, -30, -15], fov: 55 }}>
             <pointLight position={[10, 10, 10]} intensity={1.5} />
             <Suspense fallback={null}>
-                <group rotation={[0, Math.PI, 0]} position={[0, -0.8, 0]} scale={2.3}>
+                <group rotation={[0, Math.PI, 0]} position={[0, -0.8, 0]} scale={2}>
                     <Model />
                 </group>
                 <Environment preset="city" />

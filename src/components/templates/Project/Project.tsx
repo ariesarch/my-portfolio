@@ -7,58 +7,62 @@ import Circles from "@/components/atoms/Circles";
 import Bulb from "@/components/atoms/Bulb";
 import WorkSlider from "@/components/atoms/WorkSlider";
 import { useState } from "react";
-import { SelectedProject, SetSelectedProject } from "@/utils/constants";
+import { SelectedProject } from "@/utils/constants";
+import { Container } from "@/components/Container";
+import { Brain } from "@/components/atoms/Brain";
+import { Neurons } from "@/components/atoms/Neurons";
 
-const defaultProject: SelectedProject = {
+const projectOverview: SelectedProject = {
     title:"Projects undertaken",
-    description: ["lorem","Hello"]
+    description: [
+        "Each project showcases a unique blend of technical expertise, client collaboration, and innovation to deliver exceptional digital experiences.",
+        "Led end-to-end project management, including overseeing backend, frontend, and mobile development teams. Managed client interactions, requirement gathering, and task assignment, while actively contributing to technical problem-solving and productivity enhancements. Emphasized code review, refactoring, and QA processes to ensure high-quality deliverables."
+    ]
 }
 const Project = () => {
-    const [selectedPrj,setSelectedProject] = useState(defaultProject);
+    const [selectedPrj,setSelectedProject] = useState(projectOverview);
+    const resetProjectOverview= ()=>{
+        setSelectedProject(projectOverview);
+    }
     return (
-        <>
-            <div className="mx-auto">
-                <div className="flex flex-col xl:flex-row gap-x-2">
-                    {/* slider */}
-                    <motion.div
-                        variants={fadeIn("down", 0.6)}
-                        initial="hidden"
-                        animate="show"
-                        exit="hidden"
-                        className="w-full xl:max-w-[65%]"
-                    >
-                    <WorkSlider selectedPrj={selectedPrj} setSelectedProject={setSelectedProject} />
-                    </motion.div>
-                    {/* text */}
-                    <div className="bg-primary/30 text-center flex xl:w-[30vw] flex-col lg:text-left mb-4 xl:mb-0">
-                        <motion.h2
-                            variants={fadeIn("up", 0.2)}
-                            initial="hidden"
-                            animate="show"
-                            exit="hidden"
-                            className="h2"
-                        >
-                            {selectedPrj?.title}
-                            <span className="text-accent">.</span>
-                        </motion.h2>
-                        <motion.div
-                            variants={fadeIn("up", 0.4)}
-                            initial="hidden"
-                            animate="show"
-                            exit="hidden"
-                            className="mb-4 max-w-[400px] mx-auto lg:mx-0"
-                        >
-                            {
-                                selectedPrj && selectedPrj.description && selectedPrj.description.map((item, id) => (
-                                    <p key={id}>{item}</p>
-                                ))
-                            }
-                        </motion.div>
-                    </div>
-                </div>
+        <Container className="flex flex-col xl:flex-row gap-2">
+            <motion.div
+                variants={fadeIn("down", 0.6)}
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                className="w-full xl:w-1/2"
+            >
+            <WorkSlider setSelectedProject={setSelectedProject} />
+            </motion.div>
+            {/* text */}
+            <div className="xl:w-1/2 text-center flex flex-col xl:text-left xl:mb-0 z-5">
+                <motion.p
+                    variants={fadeIn("up", 0.2)}
+                    initial="hidden"
+                    animate="show"
+                    exit="hidden"
+                    className="text-3xl font-bold text-accent/40"
+                >
+                    {selectedPrj?.title}
+                </motion.p>
+                <motion.div
+                    variants={fadeIn("up", 0.4)}
+                    initial="hidden"
+                    animate="show"
+                    exit="hidden"
+                    className="mb-4 mx-auto lg:mx-0 z-1"
+                >
+                    {
+                        selectedPrj && selectedPrj.description && selectedPrj.description.map((item, id) => (
+                            <p key={id} className={`text-white font-medium leading-6 mb-2 ${id==0&&'italic'}`}>{item}</p>
+                        ))
+                    }
+                </motion.div>
             </div>
-            <Bulb />
-        </>
+            <Bulb handleClick={resetProjectOverview} className="hidden md:block right-2 bottom-1 -rotate-45"/>
+            <Bulb handleClick={resetProjectOverview} className="hidden lg:hidden md:block left-2 bottom-1 rotate-45"/>
+        </Container>
     );
 };
 

@@ -12,51 +12,78 @@ const workSlides = {
         {
             images: [
                 {
+                    title: "BinaryLab",
+                    header: "Company Portfolio",
+                    path: "/blw.jpg",
+                    description:[
+                        "Led the revitalization of the company website, infusing it with a contemporary aesthetic and cutting-edge features.",
+                        "Determined the optimal technology stacks to enhance website performance and user experience.",
+                        "Initiated and spearheaded the development team, guiding them through the creation process from inception to completion.",
+                        "Enforced meticulous code review and conducted systematic refactoring throughout the development and QA phases, ensuring optimal code quality and enhancing overall project robustness."
+                    ],
+                    link: "https://binarylab.io/",
+                },
+                {
+                    title: "SAYA",
+                    header:"English Learning Platform",
+                    path: "/saya-web.jpeg",
+                    description:[
+                        "Crafted an innovative online platform tailored to facilitate English language acquisition, boasting dynamic features such as Live Classes, Practice Sessions, and Level Tests.",
+                        "Ensured the seamless operation and user experience of the front-end application through regular maintenance and updates.",
+                        "Collaborated closely with backend and mobile development teams to optimize platform performance and bolster security measures, ensuring a robust and reliable learning environment.",
+                        "Took charge of improving the GitHub workflow, implementing enhancements to streamline development and deployment processes, thereby fostering greater efficiency and productivity."
+                    ],
+                    link: "https://saya.education/",
+                },
+                {
                     title: "Newsmast",
+                    header: "Celebrate Decentralization with Newsmast",
                     path: "/newsmast-pwa.jpeg",
                     description: [
-                        "A decentralized social media platrorm."
+                        "Harnessing Mastodon's open-source framework, we've constructed a decentralized social media hub that fosters a resilient global network enriched with bespoke community features.Through seamless integration, users leverage their Mastodon credentials to unlock access to their instance's content within Newsmast's dynamic community network.",
+                        "As the overseer of all backend, frontend, and mobile teams, I orchestrate our project's intricate facets. From client meetings and clarifying requirements to task assignment and troubleshooting technical hurdles, my involvement ensures smooth operations and heightened productivity.",
+                        "Implemented rigorous code evaluation processes and executed comprehensive code refactoring initiatives during both development and quality assurance stages, fostering superior code integrity and fortifying project resilience."
                     ],
                     link: "https://newsmast.org/",
                 },
                 {
-                    title: "SAYA English Learning Platform",
-                    path: "/saya-web.jpeg",
-                    link: "https://saya.education/",
-                },
-                {
-                    title: "SBN",
-                    path: "/sbn-web.jpeg",
-                    link: "https://sunbusinessmyanmar.org/",
-                },
-                {
                     title: "PSS",
+                    header: "Jewellry E-commerce",
                     path: "/pss-web.jpeg",
+                    description:[
+                        "Crafted an innovative e-commerce solution tailored for a jewelry boutique, elevating customer interaction and sales through dynamic website and mobile applications.",
+                        "Engaged directly with clients to ascertain project requirements and conducted in-depth research to devise optimal e-commerce strategies.",
+                        "Directed end-to-end development across backend, frontend, and mobile platforms, ensuring seamless integration and exceptional user experience."
+                    ],
                     link: "https://www.pyaesoneshin.com/",
-                },
+                }
             ],
         },
         {
             images: [
                 {
-                    title: "title",
-                    path: "/thumb4.jpg",
-                    link: "http://example.com",
+                    title: "Artscape",
+                    header: "Online Art Gallery and Shop",
+                    path: "/artscape-web.jpg",
+                    link: "https://www.pyaesoneshin.com/",
                 },
                 {
-                    title: "title",
-                    path: "/thumb1.jpg",
-                    link: "http://example.com",
+                    title: "MG&J",
+                    header:"Jewellry E-commerce",
+                    path: "/mgj-web.jpeg",
+                    link: "https://www.mgjmyanmar.com/",
                 },
                 {
-                    title: "title",
-                    path: "/thumb2.jpg",
-                    link: "http://example.com",
+                    title: "Stylo",
+                    header:"Suit and Customized Clothings",
+                    path: "/stylo.jpg",
+                    link: "https://www.stylocollection.com",
                 },
                 {
-                    title: "title",
-                    path: "/thumb3.jpg",
-                    link: "http://example.com",
+                    title: "SBN",
+                    header: "English Learning Platform",
+                    path: "/sbn-web.jpeg",
+                    link: "https://sunbusinessmyanmar.org/",
                 },
             ],
         },
@@ -64,10 +91,9 @@ const workSlides = {
 };
 
 interface WorkSliderProps {
-    selectedPrj: SelectedProject;
     setSelectedProject: SetSelectedProject
 }
-const WorkSlider: React.FC<WorkSliderProps> = ({ selectedPrj, setSelectedProject }) => {
+const WorkSlider: React.FC<WorkSliderProps> = ({ setSelectedProject }) => {
     const handleImageHover = (image: SelectedProject) => {
         setSelectedProject(image);
     };
@@ -81,16 +107,16 @@ const WorkSlider: React.FC<WorkSliderProps> = ({ selectedPrj, setSelectedProject
         >
             {workSlides.slides.map((slide, i) => (
                 <SwiperSlide key={i}>
-                    <div className="grid grid-cols-2 grid-rows-2 gap-2 max-h-[540px]">
+                    <div className="grid grid-cols-2 grid-rows-2 gap-2 ">
                         {slide.images.map((image, imageI) => (
                             <div
                                 className=" relative rounded-lg overflow-hidden flex items-center justify-center group"
                                 key={imageI}
-                                onMouseEnter={() => handleImageHover(image)}
+                                onClick={() => handleImageHover(image)}
                             >
-                                <div className="flex items-center justify-center relative overflow-hidden group">
+                                <div className="flex items-center justify-center relative overflow-hidden group h-full">
                                     {/* image */}
-                                    <div className="object-cover ">
+                                    <div className="object-cover h-full">
                                         <Image
                                             src={image.path}
                                             alt={image.title}
@@ -99,14 +125,11 @@ const WorkSlider: React.FC<WorkSliderProps> = ({ selectedPrj, setSelectedProject
                                             className="block w-full"
                                         />
                                     </div>
-
-
                                     {/* overlay gradient */}
                                     <div
                                         className="absolute inset-0 bg-gradient-to-l from-transparent via-[#e838cc] to-[#4a22bd] opacity-0 group-hover:opacity-80 transition-all duration-700"
                                         aria-hidden
                                     />
-
                                     {/* title */}
                                     <div className="absolute bottom-0 translate-y-full group-hover:-translate-y-10 group-hover:xl:-translate-y-20 transition-all duration-300">
                                         <Link
