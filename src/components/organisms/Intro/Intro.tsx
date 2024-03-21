@@ -59,8 +59,9 @@ const Model = () => {
                         {/* Drei's HTML component can "hide behind" canvas geometry */}
                         {/* <Html className="content" rotation-x={-Math.PI / 2} position={[0, 0.05, -0.09]} transform occlude> */}
                         <Html className="w-full h-full" rotation-x={-Math.PI / 2} position={[0, 0.09, 0]} transform occlude scale={1.04}>
-                            <iframe src="/Kyn-(SFSSE).pdf" style={{
-                                margin: '0', width: '334px',
+                            <iframe src="/resume.pdf" style={{
+                                margin: '0', 
+                                width: '334px',
                                 height: '216px' }} />
                         </Html>
                             {/* <motion.div
