@@ -27,7 +27,7 @@ export const Home = ()=> {
                     animate="show"
                     exit="hidden"
                     transition={{ duration: 1, ease: "easeInOut" }}
-                    className="h-full"
+                    className="h-full xs:h-1/2"
                 >
                     <Intro />
                     

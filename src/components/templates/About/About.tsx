@@ -200,7 +200,7 @@ export const About = ()=>{
                     className="mx-auto px-2 md:px-3 mb-1">
                     In summary, I offer a potent mix of technical expertise, strategic vision, and leadership finesse, making me a valuable asset for driving organizational success in dynamic environments.
                 </motion.p>
-                <div className="z-3 absolute bottom-1 left-4 h-1/2 w-full">
+                <div className="z-3 absolute bottom-8 left-4 h-1/2 w-full">
                     <Neurons />
                 </div>                 
                 </div>
