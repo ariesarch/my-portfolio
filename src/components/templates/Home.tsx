@@ -10,7 +10,7 @@ import { Container } from "../Container";
 import { Neurons } from "../atoms/Neurons";
 export const Home = ()=> {
     return (
-        <Container className="flex flex-col-reverse xl:flex-row gap-x-1">
+        <Container className="flex flex-col xl:flex-row gap-x-1">
             <div className="w-full h-screen">
                 <motion.div
                     variants={fadeIn("up", 0.5)}
@@ -40,13 +40,13 @@ export const Home = ()=> {
                         initial="hidden"
                         animate="show"
                         exit="hidden"
-                        className="text-2xl"
+                        className="h2"
                     >
                     {/* Discover the Artistry of {" "}
                     <span className="text-accent">Software Development and Innovation!</span> */}
                         {/* Your Gateway <br/>to{" "}
                         <span className="text-accent">Creativity</span> */}
-                    Commanding the frontiers of backend, frontend, and mobile with precision, while igniting sparks of innovation through leadership, mentorship, and problem-solving acumen.
+                    Commanding the frontiers of <span className="text-accent/90">backend</span>, <span className="text-accent/70">frontend</span>, and <span className="text-accent/40">mobile</span> with precision, while igniting sparks of innovation through leadership, mentorship, and problem-solving acumen.
                     </motion.h2>
                     {/* subtitle */}
                     {/* <motion.p
@@ -62,9 +62,9 @@ export const Home = ()=> {
                     quod laudantium debitis.
                 </motion.p> */}
             </div>
-            <div className="z-3 absolute bottom-2 right-2 h-full w-max">
+            {/* <div className="z-3 absolute bottom-2 right-2 h-full w-max">
                 <Neurons />
-            </div>
+            </div> */}
         </Container>
     );
 }

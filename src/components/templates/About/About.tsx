@@ -163,71 +163,16 @@ export const About = ()=>{
     
     const [index,setIndex] = useState(0)
     return (
-        <Container className="flex flex-col-reverse xl:flex-row gap-2">
-                {/* info */}
-                <motion.div
-                    variants={fadeIn("left", 0.4)}
-                    initial="hidden"
-                    animate="show"
-                    exit="hidden"
-                    className="flex flex-col w-full h-full bg-primary/30 grow-0"
-                >
-                    <div className="flex gap-x-4 mx-auto xl:mx-0">
-                        {aboutData.map((item, itemI) => (
-                            <div
-                                key={itemI}
-                                className={`${index === itemI &&
-                                    "text-accent after:w-[100%] after:bg-accent after:transition-all after:duration-300"
-                                    } py-1 cursor-pointer uppercase relative after:w-8 after:h-[2px] after:bg-white after:absolute after:-bottom-1 after:left-0`}
-                                onClick={() => setIndex(itemI)}
-                            >
-                                {item.title}
-                            </div>
-                        ))}
-                    </div>
-
-                <div className="py-2 xl:py-6 flex flex-col gap-y-2 xl:gap-y-4 items-center xl:items-start overflow-y-auto max-h-max">
-                        {aboutData[index].info.map((item, itemI) => (
-                            <Link
-                                key={itemI}
-                                className='w-full'
-                                href={item?.href ? new URL(item.href) : ''}
-                                target="_blank"
-                            >
-                                {/* title */}
-                                {/* <div className="font-light mb-2 md:mb-0 cursor-pointer hover:text-orange-200">{item.title}</div>
-                                <div className="hidden md:flex">-</div>
-                                <div>{item.stage}</div> */}
-                                {aboutData[index].title ==='Experiences' ?(
-                                    <ExperienceItem experience={item}/>
-                                ):(
-                                <>
-                                    <div className="font-light mb-2 md:mb-0 cursor-pointer hover:text-orange-200">{item.title} - {item.stage}</div>
-                                    {/* <div className="xl:inline hidden md:flex">-</div>
-                                    <div>{item.stage}</div>  */}
-                                </>
-                                )}
-
-                                <div className="flex gap-x-4">
-                                    {/* icons */}
-                                    {item.icons?.map((Icon, iconI) => (
-                                        <div key={iconI} className="text-2xl text-accent">
-                                            <Icon />
-                                        </div>
-                                    ))}
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </motion.div>
+        <Container className="flex flex-col xl:flex-row gap-2 ">
+                
                 {/* text */}
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col w-full relative">
                     <motion.h3
                         variants={fadeIn("right", 0.2)}
                         initial="hidden"
                         animate="show"
                         exit="hidden"
-                        className="text-xl"
+                        className="text-2xl"
                     >
                         Captivating <span className="text-accent text-7xl">stories</span> birth
                         magnificent designs.
@@ -238,21 +183,84 @@ export const About = ()=>{
                         animate="show"
                         className="mx-auto px-2 md:px-3 mb-1"
                     >
-                    Bringing over 9 years of experience to the realm of software engineering, proficiency in backend, frontend, and mobile development characterizes my journey. Transitioning from a senior full-stack developer to my current role as a software development manager, I have acquired a diverse skill set and comprehensive understanding of the development lifecycle.
-                    </motion.p>                    
+                    With a rich background spanning over 9 years in the software engineering realm, I excel in pivotal roles such as Software Development Manager, Tech Lead, Lead Software Engineer, and Senior Full Stack Engineer. My expertise traverses a wide spectrum of domains, including backend, frontend, and mobile development, enabling me to drive transformative initiatives and spearhead impactful projects.
+                    </motion.p>
                 <motion.p
                     variants={fadeIn("left", 0.4)}
                     initial="hidden"
                     animate="show"
                     className="mx-auto px-2 md:px-3 mb-1"
                 >
-                    Bringing over 9 years of experience to the realm of software engineering, proficiency in backend, frontend, and mobile development characterizes my journey. Transitioning from a senior full-stack developer to my current role as a software development manager, I have acquired a diverse skill set and comprehensive understanding of the development lifecycle.
-                    As a software development manager, I leverage technical acumen to lead teams, ensuring projects progress from inception to fruition seamlessly. Passion for technology and a commitment to excellence underscore my approach, as I strive to deliver impactful solutions and drive positive change through innovation.
-                </motion.p>                    
+                    I orchestrate projects from inception to execution, blending technical acumen and strategic insight. My leadership fosters innovation, cultivates excellence, and empowers teams to exceed expectations. With a collaborative approach and a knack for creative problem-solving, I navigate challenges and capitalize on opportunities.
+                </motion.p>
+                <motion.p 
+                    variants={fadeIn("left", 0.4)}
+                    initial="hidden"
+                    animate="show" 
+                    className="mx-auto px-2 md:px-3 mb-1">
+                    In summary, I offer a potent mix of technical expertise, strategic vision, and leadership finesse, making me a valuable asset for driving organizational success in dynamic environments.
+                </motion.p>
+                <div className="z-3 absolute bottom-1 left-4 h-full w-full">
+                    <Neurons />
+                </div>                 
                 </div>
-            <div className="z-3 absolute bottom-1 -right-0.5 h-full w-1/2">
-                <Neurons />
-            </div>
+            
+            {/* info */}
+            <motion.div
+                variants={fadeIn("left", 0.4)}
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                className="flex flex-col w-full h-full bg-primary/30 grow-0"
+            >
+                <div className="flex gap-x-4 mx-auto xl:mx-0">
+                    {aboutData.map((item, itemI) => (
+                        <div
+                            key={itemI}
+                            className={`${index === itemI &&
+                                "text-accent after:w-[100%] after:bg-accent after:transition-all after:duration-300"
+                                } py-1 cursor-pointer uppercase relative after:w-8 after:h-[2px] after:bg-white after:absolute after:-bottom-1 after:left-0`}
+                            onClick={() => setIndex(itemI)}
+                        >
+                            {item.title}
+                        </div>
+                    ))}
+                </div>
+
+                <div className="py-2 xl:py-6 flex flex-col gap-y-2 xl:gap-y-4 items-center xl:items-start overflow-y-auto max-h-max">
+                    {aboutData[index].info.map((item, itemI) => (
+                        <Link
+                            key={itemI}
+                            className='w-full'
+                            href={item?.href ? new URL(item.href) : ''}
+                            target="_blank"
+                        >
+                            {/* title */}
+                            {/* <div className="font-light mb-2 md:mb-0 cursor-pointer hover:text-orange-200">{item.title}</div>
+                                <div className="hidden md:flex">-</div>
+                                <div>{item.stage}</div> */}
+                            {aboutData[index].title === 'Experiences' ? (
+                                <ExperienceItem experience={item} />
+                            ) : (
+                                <>
+                                    <div className="font-light mb-2 md:mb-0 cursor-pointer hover:text-orange-200">{item.title} - {item.stage}</div>
+                                    {/* <div className="xl:inline hidden md:flex">-</div>
+                                    <div>{item.stage}</div>  */}
+                                </>
+                            )}
+
+                            <div className="flex gap-x-4">
+                                {/* icons */}
+                                {item.icons?.map((Icon, iconI) => (
+                                    <div key={iconI} className="text-2xl text-accent">
+                                        <Icon />
+                                    </div>
+                                ))}
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </motion.div>
         </Container>
     );
 }
