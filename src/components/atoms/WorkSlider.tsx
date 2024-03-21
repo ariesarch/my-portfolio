@@ -26,7 +26,7 @@ const workSlides = {
                 {
                     title: "SAYA",
                     header:"English Learning Platform",
-                    path: "/saya-web.jpeg",
+                    path: "/saya.jpeg",
                     description:[
                         "Crafted an innovative online platform tailored to facilitate English language acquisition, boasting dynamic features such as Live Classes, Practice Sessions, and Level Tests.",
                         "Ensured the seamless operation and user experience of the front-end application through regular maintenance and updates.",
