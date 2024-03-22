@@ -60,8 +60,8 @@ const Project = () => {
                     }
                 </motion.div>
             </div>
-            <Bulb handleClick={resetProjectOverview} className="hidden md:block right-2 bottom-1 -rotate-45"/>
-            <Bulb handleClick={resetProjectOverview} className="hidden lg:hidden md:block left-2 bottom-1 rotate-45"/>
+            <Bulb handleClick={resetProjectOverview} className="hidden md:block lg:block right-2 bottom-1 -rotate-45"/>
+            <Bulb handleClick={resetProjectOverview} className="hidden md:block lg:hidden left-2 bottom-1 rotate-45"/>
         </Container>
     );
 };
