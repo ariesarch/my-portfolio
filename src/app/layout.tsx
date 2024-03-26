@@ -30,7 +30,8 @@ export default function RootLayout({
     <html>
       <body>
         <main
-          className={`page bg-site text-white bg-cover bg-no-repeat relative`}
+          // className={`page bg-site text-white bg-cover bg-no-repeat relative`}
+          className={`page  text-white bg-cover bg-no-repeat relative`}
         >
           <div>
             <title>Kyaw Ye Naing | Portfolio</title>

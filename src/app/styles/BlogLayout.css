@@ -1,0 +1,15 @@
+.note-layout {
+    @apply grid grid-cols-1 gap-2;
+
+    /* @screen md {
+        @apply grid-cols-5 gap-2;
+    } */
+}
+
+.note-container {
+    @apply grid grid-cols-1;
+
+    /* @screen md {
+        @apply grid-cols-4;
+    } */
+}

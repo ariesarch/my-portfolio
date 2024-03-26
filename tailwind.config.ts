@@ -30,7 +30,8 @@ content: [
     },
     extend: {
       colors: {
-        primary: "#131424",
+        // primary: "#131424",
+        primary: "#0f172a",
         secondary: "#393A47",
         accent: "#F13024",
       },

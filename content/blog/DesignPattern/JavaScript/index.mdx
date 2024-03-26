@@ -1,0 +1,132 @@
+---
+title: Design Patterns in JavaScript 
+description: Learn Design Patterns in JavaScript
+published: true
+category: design pattern
+date: 2023-12-05
+---
+
+## Builder Pattern 
+
+A creational design pattern which separates the construction layer of complex objects from its representation layer, allowing same construction process for different representations.
+It's particularly help when you might have multiple representations of an object,or when you want to encapsulate the creation logic separate from the main application.
+The factory pattern is also used to create objects, however it doesn't matter how they are created.
+The factory pattern is concerned with the result while the builder pattern not only gets the result but also participates in the specific process of object creation, which is suitable for creating complex compound objects.
+
+### Diagram
+![Function](/blog/design-pattern/builder-function.png)
+**Function**
+![Class](/blog/design-pattern/builder-class.png)
+**Class**
+
+```
+class House {
+    constructor(){
+        this.floor = null;
+        this.wall = null;
+    }
+}
+// Builder Interface/Abstract Class
+class HouseBuilder{
+    constructor(){
+        this.house = new House();
+    }
+    buildFloor(){}
+    buildWalls(){}
+    getHouse(){
+        return this.house;
+    }
+}
+// Concrete Builder
+class WoodenHouseBuilder extend Builder{
+    buildFloor(){
+        this.house.floor = "Setup the wooden floor"
+    }
+    buildWalls(){
+        this.house.wall = "Setup the wooden wall"
+    }
+}
+// Director
+class ConstructionEngineer {
+    constructor(builder){
+        this.builder = builder
+    }
+    constructHouse() {
+        this.builder.buildFloor();
+        this.builder.buildWalls();
+        return this.builder.getHouse();
+    }
+}
+const woodenHouseBuilder = new WoodenHouseBuilder();
+const engineer = new ConstructionEngineer(woodenHouseBuilder);
+const WoodenHouse = engineer.constructHouse();
+console.log(WoodenHouse)
+```
+
+- Purpose: The House Builder example is suitable when you need to construct complex objects with multiple components or configurations.
+- Usage: It's appropriate when you want to build objects step by step, allowing for variations in construction details.
+- Advantages: Provides a clear separation of concerns between the construction process and the resulting object, making it easier to manage complex object creation.
+- Best Practice: Ideal for scenarios where objects have multiple representations and need to be constructed with varying configurations.
+
+
+```
+class FastFoodBuilder {
+    addBread(){}
+    addSauce(){}
+    addToppings(){}
+    addCheese(){}
+    getFood(){}
+}
+//concrete builder
+class PizzaBuilder extends FastFoodBuilder{
+    constructor(){
+        super();
+        this.pizza = {}
+    }
+    addBread(){
+        this.pizza.bread = 'Thin cust';
+        return this;
+    }
+    addSauce(){
+        this.pizza.sauce = 'Tomato';
+        return this;
+    }
+    addToppings(){
+        this.pizza.toppings = ["Pepperoni", "Mushrooms", "Olives"];
+        return this;
+    }
+    addCheese(){
+        this.pizza.cheese = 'Mozzarella';
+        return this;
+    }
+    getFood(){
+        return this.pizza;
+    }
+}
+class FoodDirector{
+    setBuilder(builder){
+        this.builder = builder
+    }
+    construct(){
+        this.builder.addBread().addSauce().addToppings().addCheese();
+        return this.builder.getFood();
+    }
+}
+const footDirector = new FoodDirector();
+const pizzaBuilder = new PizzaBuilder();
+footDirector.setBuilder(pizzaBuilder)
+const pizza = footDirector.construct()
+console.log(pizza)
+```
+
+- Purpose: The Fast Food Builder example is suitable for creating objects with a fixed set of properties or configurations, where each builder focuses on a specific type of object.
+- Usage: It's appropriate when you have a predefined set of steps for constructing objects, and each builder implements these steps to create different variants of the object.
+- Advantages: Provides a standardized approach for constructing objects of a specific type, making it easy to create and manage variations of the object.
+- Best Practice: Suitable for scenarios where objects have a fixed structure and only vary in specific attributes or components.
+### References:
+
+[Builder | Cheat Sheet](https://medium.com/cp-massive-programming/builder-cheat-sheet-ec0417836e82)
+[Builder Design Pattern in JavaScript (& TypeScript)](https://blog.stackademic.com/builder-design-pattern-in-javascript-typescript-d972955e1888)
+[Understanding Builder Design Pattern](https://medium.com/nerd-for-tech/understanding-builder-design-pattern-ce48a29b79)
+[Design Patterns for Javascript — Builder Pattern](https://medium.com/codex/design-patterns-for-javascript-builder-pattern-c287c54b9b6b)
+[JavaScript Design Patterns: Builder Pattern](https://freedium.cfd/https://javascript.plainenglish.io/javascript-design-patterns-builder-pattern-608dbb2020a)
