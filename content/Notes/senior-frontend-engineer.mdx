@@ -1,0 +1,1313 @@
+---
+title: Interview Preparation
+description: Interview Preparation
+published: true
+category: interview
+date: 2023-12-05
+---
+
+In this problem, you are tasked with creating a front-end application.
+
+The examination will proceed as follows:
+
+1. First, read the problem statement and create a front-end application that meets the specifications.
+  1. **You may use any framework, such as React or Vue.js. If using a framework, please refer to the notes at the end of the problem statement.**
+1. Modify the files specified in the problem statement, and press the "Run Test" button. Your score will be calculated with each execution.
+1. When you believe you can no longer achieve a higher score, submit the problem.
+1. After submitting the problem, a free-response section will appear for you to submit your source code.
+  - **If the readability of the submitted code has been compromised by the use of a framework or tools such as webpack, for the benefit of the hiring representative, please compress the source code you wrote for the test in a format such as Zip, and upload it to a cloud service like Google Drive, and provide the link in the free-response section.** Be sure not to forget to grant viewing permissions to those who have the link. Additionally, please do not upload the source code to a public location, such as a GitHub repository, where it can be accessed by anyone through a search.
+
+## Problem statements
+
+You are developing a memo application that works in a browser.
+
+This memo application saves its data by communicating with the API server. The API server has already been implemented and the specifications are written at the end of this challenge description.
+Develop a memo application that communicates with this API server.
+
+![Description of the Memo Application](https://track-contents-prod.s3.ap-northeast-1.amazonaws.com/challenges/73f643a8-4de8-46da-bef0-e0b6aa7352a6/77a3a580-5e8c-44ea-9e74-3c4be77f7d39/img/memoapp.png)
+> **Undefined behaviors**
+> A behavior that occurs when the application performs an operation not specified in the challenge statement will be considered an **undefined** behavior. It is therefore up to the examinee to choose how to develop the application.
+> There are no tests to check the functions of undefined behaviors.
+>
+> However, even though there are no tests to check the undefined behaviors (except in cases of a network error), please be careful that your program does not cause behaviors that would be unacceptable in terms of simple common sense, such as making a change without permission to a memo that should not have been edited.
+
+# Step 1: Login System
+
+First, you must implement a simple login system to manage sessions.
+
+![Login System](https://track-contents-prod.s3.ap-northeast-1.amazonaws.com/challenges/73f643a8-4de8-46da-bef0-e0b6aa7352a6/77a3a580-5e8c-44ea-9e74-3c4be77f7d39/img/1-1.gif)
+
+The requirements are as follows.
+
+1. The following HTML element exists in the **Initial State** (explained later).
+   | ID | Tag Name | Other Conditions |
+   |:---|:---|:---|
+   | `access_token` | `<input type="text">` | Enabled when the state is the Initial State. |
+   | `login` | `<button>` | `LOGIN` is displayed. This element is called the **Login Button** in this challenge statement. |
+2. A token can be assigned to `#access_token`.
+    *Valid tokens are in the UUID(v4) format using lowercase letters, that is, strings accepted in the following regular expression.
+
+```plain
+/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+```
+3. Regarding the token:
+    1. When the token is valid, the element ‘#login’ is enabled and the login button will be clickable.
+    2. When the token is not valid, the element ‘#login’ is disabled and the login button will not be clickable.
+4. When the login button is clicked: 
+    1. Both the `#access_token` element and the `#login` element are disabled.
+    2. A request to **list the categories** is issued to the server using the `#access_token`.
+> <dl>
+> <dt>Initial State</dt>
+> <dd>1,000 ms after loading `index.html`.</dd>
+> The initial value for the `#access_token` can be a random or a dynamic value that was generated when initializing.
+>
+> The following code generates UUID (v4) dynamically. Please use it if necessary.
+>
+> ```javascript
+> function uuid() {
+>   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+>     .split('')
+>     .map(c => {
+>       switch (c) {
+>         case 'x': return (Math.random() * 16 | 0).toString(16);
+>         case 'y': return ((Math.random() * 4 | 0) + 8).toString(16);
+>         default: return c;
+>       }
+>     })
+>     .join('');
+>  }
+> ```
+> Errors not specified in the specification do not have to be considered in the process of communicating with the server.
+
+## Step 2: Displaying the Category/Memo List.
+
+Next, display the category/memo list according to the value of the request result.
+
+![Category/Memo List](https://track-contents-prod.s3.ap-northeast-1.amazonaws.com/challenges/73f643a8-4de8-46da-bef0-e0b6aa7352a6/77a3a580-5e8c-44ea-9e74-3c4be77f7d39/img/2-1.gif)
+
+The requirements are as follows.
+
+1. After clicking the login button, the following task is executed using the result of the category listing request. This is done within 1,000 ms (hereinafter  called **quickly** in this challenge) after the login button is clicked. 
+   *Each category has the following elements. These elements will be called **Category Items**.
+
+     | ID | Tag Name | Other Conditions |
+     |:---|:---|:---|
+     | `category-<id>` | Optional | Example: `category-1`, `category-23` |
+     | `category-<id>-title` | Optional | <ul><li>The child element of `#category-<id>`</li><li>`<title>` of the category is assigned as the property of `textContent`.</li><li>This will be called the **Category Title**.</li></ul> |
+
+2. Each Category Item has two states, **expanded** and **minimized**.
+3. When a minimized Category Title is clicked, the corresponding Category Item will quickly expand.
+   In this case the following process is done.
+    1. The **memo searching** request is issued using the category id.
+    2. The following element (**Memo Item**) is assigned to each of the memos in the result array.
+       | ID | Tag Name | Other Conditions |
+       |:---|:---|:---|
+       | `memo-<id>` | Optional | <ul><li>The `<title>` of the memo is assigned as the property of `textContent`.</li><li>A child element of `#category-<category_id>` and not a child element of `#category-<category_id>-title`.</li></ul> |
+    3. The other Category Items are minimized.
+    *Thus, there will be only one Category Item expanded at a time.
+4. When an expanded Category Title is clicked, the corresponding Category Item will quickly minimize.
+5. A minimized Category Item does not have a Memo Item element.
+6. When the login button is clicked, all the Category Items are minimized until a Category Title is clicked.
+
+> Be sure that the corresponding Memo Item of of the minimized Category Item is **always displayed**.
+>
+> Even if the element is hidden from the user in the browser by changing the style using `display: none`, if it exists in the DOM tree, it will be determined that the requirements of item 5 have not been met.
+
+## Step 3: Memo Edit
+
+Next, implement a new feature to edit the memo by selecting the Memo Item displayed on the list.
+
+![Memo Edit](https://track-contents-prod.s3.ap-northeast-1.amazonaws.com/challenges/73f643a8-4de8-46da-bef0-e0b6aa7352a6/77a3a580-5e8c-44ea-9e74-3c4be77f7d39/img/3-1.png)
+
+The requirements are as follows.
+
+1. The following HTML elements exist in the initial state.
+
+  | ID | Tag Name | Other Conditions |
+  |:---|:---|:---|
+  | `memo-title` | `<input type="text">` | |
+  | `memo-content` | `<textarea>` | |
+  | `save-memo` | `<button>` | `SAVE` is displayed |
+
+2. When no memos are **selected**, all the elements in item 1 are disabled. In the initial state, no memos are selected.
+3. When a Memo Item is clicked, that memo will be **selected**.
+4. When a memo is selected, the following tasks are performed.
+    1. A request is issued to **select a memo**.
+    2. `<title>` is set to the `value` of  `#memo-title`.
+    3. `<content>` is set to the value of `#memo-content`.
+    4. `#memo-title`, `#memo-content`, and `#save-memo` are enabled.
+5. A request to **update a memo** is issued to `#memo-title` and `#memo-content` when the `#save-memo` button is clicked.
+
+> Do not display a confirmation dialog during this challenge.
+> The automation test does not support confirmation dialogs.
+
+## Step 4: Adding a Memo
+
+Implement a feature to add a new memo.
+
+![Adding a Memo](https://track-contents-prod.s3.ap-northeast-1.amazonaws.com/challenges/73f643a8-4de8-46da-bef0-e0b6aa7352a6/77a3a580-5e8c-44ea-9e74-3c4be77f7d39/img/4-1.gif)
+
+The requirements are as follows.
+
+1. The following HTML element exists in the initial state.
+    | ID | Tag Name | Other Conditions |
+    |:---|:---|:---|
+    | `new-memo` | `<button>` | `NEW` or `+` is displayed. Disabled in initial state.|
+2. When a Category Item is expanded `#new-memo` is valid.
+3.  A request to **add a memo** is issued when `#new-memo` is clicked.
+    * `<title>` and `<content>` can have any content.
+4. A Memo Item is added to the expanded Category Item corresponding to the request.
+5. The added Memo Item is selected and ready to be edited.
+
+## Step 5: Deleting the Memo
+
+Implement a new feature to delete the memo.
+
+![Deleting the Memo](https://track-contents-prod.s3.ap-northeast-1.amazonaws.com/challenges/73f643a8-4de8-46da-bef0-e0b6aa7352a6/77a3a580-5e8c-44ea-9e74-3c4be77f7d39/img/5-1.gif)
+
+The requirements are as follows.
+
+1. The following HTML element exists in the initial state.
+
+  | ID | Tag Name | Other Conditions |
+  |:---|:---|:---|
+  | `delete-memo` | `<button>` | `DELETE` or `-` is displayed. Hidden in the initial state.|
+
+2. `#delete-memo` is enabled when a memo is selectable.
+3. A request to **delete a memo** is issued when the `#delete-memo` button is clicked.
+4. The corresponding Category Item is deleted from the clicked Memo Item.
+5. The Memo Item will be unselected. (The memo being edited does not exist.)
+
+## Notice
+
+### About the Layout and Design
+
+The elements that are objects for the automation test have to have a specific id and tag name, but the layout and design will not be tested.
+
+### Frameworks
+
+There are no restrictions on the development framework.
+When the implementation suits the requirements, any framework or UI component library can be used in this challenge.
+
+Be sure to follow the constraints below.
+
+* You are not allowed to run a build command (for example `npm run build`) during the automatic test.
+
+* The test only accepts `index.html` as the name of the HTML file. You are not allowed to use other names.
+
+* Attribute values for `<script>` tags and `<link>` tags must be enclosed with `”` characters.
+
+> **Using jQuery**
+>
+> If you are using jQuery follow the following steps.
+>
+> 1. Add the following script to [public/index.html](public/index.html).
+>    ```html
+>    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+>    ```
+> 2. Create public/index.js.
+> 3. Write all the jQuery code in public/index.js.
+
+> **Using Vue.js(Browser)**
+>
+> The Vue.js framework can be used from the browser without performing the build process.
+>
+> 1. Add the following script to [public/index.html](public/index.html).
+>    ```html
+>    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+>    <script src="index.js"></script>
+>    ```
+> 2. Create public/index.js.
+> 3. Write the code in public/index.js.
+
+> **Using Vue.js (Vue CLI)**
+>
+> Using the Vue CLI, you can take full advantage of the features of Vue.js.
+>
+> If you are using Vue CLI, edit your code on your local PC and submit only the build project to Track.
+>
+> Using the CLI is recommended, but using the browser version is also acceptable.
+>
+> 1. Create a project
+>    ```bash
+>    vue create memoapp
+>    ```
+> 2. Add the configuration of  `publicPath: "./"` to `vue.config.js`.
+> 3. Develop the app on your local PC.
+>    ```bash
+>    cd memoapp
+>    npm run serve
+>    ```
+>    The test loads `${origin}/index.html`. However, the "Preview" screen may not work well with Vue Router, etc., because the path is inserted before `index.html` like `frontend-proxy/index.html`. Please be aware of this.
+> 4. Building the app.
+>    ```bash
+>    npm run build
+>    ```
+> 5. Copy the `dist` directory to the `public` directory in Track to submit your app.
+>    * The file names of `.js` files and `.css` files change with each build.
+>      If you are using Vue.js from the browser, the selected file will be imported from `index.html`.
+>    * The maximum file size that can be uploaded is 1 MB.
+       Be careful not to upload unnecessary files, such as files with the `.map` extension.
+
+> **Using React (Browser)**
+>
+> Use the React framework from the browser without performing the build process in advance.
+>
+> 1. Add the following script to [public/index.html](public/index.html).
+>    ```html
+>    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+>    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+>    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+>    <script type="text/babel" src="script.js"></script>
+>    ```
+> 2. Create public/index.js.
+>    * `.jsx` is recommended for the file extension if you are using the CLI.
+> 3. Write the code in public/index.js.
+
+> **Using React (create-react-app CLI)**
+>
+> You can develop a React app easily by using the create-react-app CLI.
+> Edit your code on your local PC and only submit the build project to Track.
+>
+> Using the CLI is recommended, but using the browser version is also acceptable.
+>
+> 1. Create a React project.
+>    ```bash
+>    npx create-react-app memoapp
+>    ```
+> 2. Develop your app on your local PC.
+>    ```bash
+>    cd memoapp
+>    npm start
+>    ```
+>    The test loads `${origin}/index.html`. However, the "Preview" screen may not work well with React Router, etc., because the path is inserted before `index.html` like `frontend-proxy/index.html`. Please be aware of this.
+> 3. Configure the Webpack settings if necessary.
+>     In particular, if you are using React from the browser, there are a lot of build files with default settings.
+>     1. Detach the project from react-scripts.
+>        ```bash
+>        npm run eject
+>        ```
+>     2. Edit the settings in `config/webpack.conf.js` and `scripts/build.js`.
+> 4. Building the app.
+>    ```bash
+>    npm run build
+>    ```
+> 5. Copy the `build` directory to the `public` directory of Track to submit your app.
+>    * The file names of `.js` files and `.css` files change with each build.
+>      If you are using React from the browser, the selected file will be imported from `index.html`.
+>    * The maximum file size that can be uploaded is 1 MB.
+       Be careful not to upload unnecessary files, such as files with the `.map` extension.
+
+### Specifications for the API server
+
+https://challenge-server.tracks.run/memoapp
+
+is the URL for the API server.
+
+The API server has the following endpoint.
+It can be assumed that all of the APIs will return a response within 500 ms after the request is issued to the server.
+Specify `Content-Type: application/json` in the request header.
+
+* **GET `/category`**: Enumerates the category list.
+    + parameter: none
+    + return value
+        - **`200 OK`** Array that describes the category list.
+
+            * `id` (number): category id
+            * `name` (string): category name
+            Example:
+            ```json
+            [
+                {
+                    "id": 2,
+                    "name": "todo",
+                },
+                {
+                    "id": 3,
+                    "name": "tips"
+                }
+            ]
+            ```
+
+* **GET `/memo`**: Search the memo.
+   + parameter
+       - query `category_id` (number): category id
+   + return value
+       - **`200 OK`** List of memos (array). When there are no memos an empty array is returned.
+           * `id` (number): memo id
+           * `title` (string): memo title
+
+           Example:
+           ```json
+           [
+               { "id": 1, "title": "todo1" },
+               { "id": 2, "title": "todo2" }
+           ]
+           ```
+
+* **POST `/memo`**: Add a new memo.
+   + parameter
+       - body (JSON): memo to add
+           * `category_id` (number): category id
+           * `title` (string): memo title
+           * `content` (string): memo content
+
+   + return value
+       - **`200 OK`** Returns the content of the added memo.
+           * `id` (number): memo id.
+           * `category_id` (number): category id. Matches with the id selected in the request body.
+           * `title` (string): title. Matches with the title selected in the request body.
+           * `content` (string): The content of the memo. Matches with the content in the request body.
+       - **`400 Bad Request`** When the parameter does not exist in the request the response won’t return a response body.
+
+* **GET `/memo/{id}`**: Get the selected memo.
+   + parameter:
+       - path `id` (number): memo id.
+   + return value
+       - **`200 OK`** Returns the memo content.
+           * `id` (number): memo id
+           * `category_id` (number): category id
+           * `title` (string): memo title
+           * `content` (string): memo content
+
+           Example:
+           ```json
+           {
+              "id": 1,
+              "category_id": 1,
+              "title": "todo1",
+              "content": "do something",
+           }
+           ```
+       - **`404 Not Found`**: When a memo with the selected id does not exist, the response won’t return a response body.
+
+* **PUT `/memo/{id}`**: Updates the selected memo.
+   + parameter
+       - body (JSON): The updated memo.
+           * `category_id` (number): category id
+           * `title` (string): memo title
+           * `content` (string): memo content
+
+   + return value
+       - **`200 OK`** Returns the content of the added memo.
+           * `id` (number): memo id
+           * `category_id` (number): category id
+           * `title` (string): memo title
+           * `content` (string): memo content
+       - **`404 Not Found`**: When a memo with the selected id does not exist, the response won’t return a response body.
+       - **`400 Bad Request`** When the parameter does not exist, the response won’t return a response body.
+
+* **DELETE `/memo/{id}`**: Delete the selected memo.
+   + parameter:
+       - path `id` (number): memo id
+   + return value
+       - **`200 OK`**: No response body.
+       - **`404 Not Found`**: This will be returned when a memo with the selected id does not exist.
+
+### Session Token
+
+Every API request needs a token to distinguish each request.
+  - Tokens are in the UUID(v4) format.
+  - A token is assigned to the `X-ACCESS-TOKEN` of the request header.
+  - When an existing token is found the session restarts with data corresponding to the token.
+  - When a new token is used the API server initializes the session with the sample data.
+  - When an invalid token is used, the server returns `403 Forbidden`.
+      + In reality, the tests of this challenge will not access the server with an invalid token. There is no need for a specific implementation to apply for this case.
+  - There is a limit to the number of requests issued per token and the amount of the assigned data in each token. When the token exceeds these limits, `429 Too Many Requests` will be returned from the server.
+      + In reality, the tokens used in the tests of this challenge will not exceed these limits. There is no need for a specific implementation to apply for this case.
+  - Tokens and the corresponding data are available for at least 2 hours.
+
+```javascript
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@3.0.5/dist/vuetify.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+      <v-app>
+        <v-app-bar color="primary" prominent>
+          <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <v-toolbar-title>Memo App</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-text-field id="access_token" v-model="accessToken" :disabled="isLoading" />
+          <v-btn id="login" class="text-uppercase" :disabled="!isTokenValid || isLoading" @click="handleLogin">Login</v-btn>
+        </v-app-bar>
+        <v-navigation-drawer fixed v-model="drawer">
+          <v-list>
+            <v-list-item prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg" subtitle="sandra_a88@gmailcom"
+              title="Sandra Adams"></v-list-item>
+          </v-list>
+          <v-divider></v-divider>
+          <v-list v-for="(category,index) in categories" :key="index" density="compact" nav>
+            <!-- <v-list-item prepend-icon="mdi-home" :title="category.name"></v-list-item> -->
+            <v-list-group :key="index" prepend-icon="mdi-folder" :id="'category-' + category.id">
+              <template v-slot:activator="{ props }">
+                <v-list-item v-bind="props" :title="category.name " @click.stop="selectCategory(category)"
+                  :id="'category-' + category.id + '-title'"></v-list-item>
+              </template>
+              <v-list-item v-for="(item, i) in memos" :key="i" prepend-icon="mdi-file" :title="item.title"
+                @click.stop="editMemo(item.id)" />
+            </v-list-group>
+          </v-list>
+        </v-navigation-drawer>
+        <v-main style="height: 250px" class="mx-auto my-4">
+          <v-card width="400" v-show="selectedMemo.id">
+            <v-card-title>Edit Memo</v-card-title>
+            <v-card-text>
+              <v-form @submit.prevent="updateMemo">
+                <v-text-field v-model="selectedMemo.title" />
+                <v-textarea v-model="selectedMemo.content" />
+                <v-btn size="large" density="comfortable" class="text-uppercase" type="submit" color="primary">Save</v-btn>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-main>
+      </v-app>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@3.0.5/dist/vuetify.min.js"></script>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
+
+```
+
+
+```JavaScript
+
+<v-list-group v-for="(category, index) in categories" :key="index" prepend-icon="mdi-folder" :id="'category-' + category.id" :value="isActive(category)">
+    <template v-slot:activator="{ props }">
+      <v-list-item
+        v-bind="props"
+        :title="category.name"
+        @click.stop="selectCategory(category)"
+        :id="'category-' + category.id + '-title'"
+      ></v-list-item>
+    </template>
+    <template v-for="(item, i) in memos" :key="i">
+      <v-list-item v-show="isActive(category)" prepend-icon="mdi-file" :title="item.title" @click.stop="editMemo(item.id)" />
+    </template>
+  </v-list-group>
+  <v-list-item>
+    <v-btn size="large" density="comfortable" class="text-uppercase" type="submit" color="primary" id="new_memo" :disabled="!selectedCategory" @click.stop="onNewItem">New</v-btn>
+  </v-list-item>
+</v-list>
+```
+
+### Vuetify 
+
+
+```JavaScript
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@3.0.5/dist/vuetify.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@3.0.5/dist/vuetify.min.js"></script>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="text/x-template" id="app-template">
+    <v-app>
+      <v-app-bar color="primary" prominent>
+        <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-toolbar-title>Memo App</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-text-field id="access_token" v-model="accessToken" :disabled="isLoading"/>
+        <v-btn id="login" class="text-uppercase" :disabled="!isTokenValid || isLoading"  @click="handleLogin">Login</v-btn>
+      </v-app-bar>
+      <v-navigation-drawer fixed v-model="drawer">
+        <v-list>
+          <v-list-item prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg" subtitle="sandra_a88@gmailcom"
+            title="Sandra Adams"></v-list-item>
+        </v-list>
+        <v-divider></v-divider>
+          <v-list  density="compact" nav>
+            <!-- <v-list-item prepend-icon="mdi-home" :title="category.name"></v-list-item> -->
+            <v-list-group v-for="(category,index) in categories" :key="index" prepend-icon="mdi-folder" :id="'category-' + category.id">
+              <template v-slot:activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  :title="category.name"
+                  @click.stop="selectCategory(category)"
+                  :id="'category-' + category.id + '-title'"
+                ></v-list-item>
+              </template>
+              <template v-for="(item, i) in memos"
+                :key="i">
+                <v-list-item
+                v-show="isActive(category)"
+                prepend-icon="mdi-file"
+                :title="item.title"
+                @click.stop="editMemo(item.id)"
+              />
+              </template>
+            </v-list-group>
+            <v-list-item>
+              <v-btn size="large" density="comfortable" class="text-uppercase" type="submit" color="primary" id="new_memo" :disabled="!selectedCategory" @click.stop="onNewItem">New</v-btn>
+            </v-list-item>
+          </v-list>
+      </v-navigation-drawer>
+      <v-main style="height: 250px" class="mx-auto my-4">
+        <v-card width="400">
+          <v-card-title>{{disabledFields}} Memo - {{selectedMemo}}</v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="onSubmit" ref="formRef">
+              <v-text-field :rules="titleRule" placeholder="Title" v-model="selectedMemo.title" id="memo_title" :disabled="disabledFields"/>
+              <v-textarea :rules="contentRule" placeholder="Content" v-model="selectedMemo.content" id="memo_content" :disabled="disabledFields"/>
+              <v-btn size="large" density="comfortable" class="text-uppercase" type="submit" color="primary" id="save_memo" :disabled="disabledFields">Save</v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-main>
+    </v-app>
+    </script>
+  <script src="index.js"></script>
+</body>
+
+</html>
+
+```
+
+```JavaScript
+
+
+const { createApp, ref, onMounted,computed,nextTick } = Vue;
+const { createVuetify } = Vuetify;
+
+const vuetify = createVuetify({theme: {
+    themes: {
+      light: {
+        dark: false,
+        colors: {
+          primary: '#4CAF50',
+          secondary: '#FFCDD2'
+        }
+      },
+    },
+  }});
+const app = createApp({
+    template: "#app-template",
+    // el: "#app",
+    data() {
+        return {
+            message: "Hello",
+            titleRule: [
+                value => {
+                if (value) return true
+                return 'You must enter the title.'
+                },
+            ],
+            contentRule: [
+                value => {
+                if (value) return true
+                return 'You must enter the content.'
+                },
+            ],
+
+        }
+    },
+    setup() {
+        onMounted(async () => {
+            await nextTick(); // Wait for Vue to finish updating the DOM
+            await new Promise(resolve => setTimeout(resolve, 8000)); // Adjust the delay as needed
+        // Run your test cases here
+        });
+        const drawer = ref(true);
+        const isLoading = ref(false);
+        const activeCategory = ref(null);
+        const disabledFields = ref(true);
+        const accessToken = ref(uuid());
+        const categories = ref([]);
+        const selectedCategory = ref(null);
+        const memos = ref([]);
+        const formRef = ref(null);
+
+        const selectedMemo = ref({ id:"",category_id:"",title: "", content: "" }); // Ensure selectedMemo has a title property
+  
+        // // Define a separate reactive property to bind to v-model
+        // const memoTitle = computed({
+        //     get: () => selectedMemo.value.title,
+        //     set: (value) => selectedMemo.value.title = value,
+        // });
+        // Define a computed property to check if the token is valid
+        const isTokenValid = computed(() => {
+        const tokenPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+        return tokenPattern.test(accessToken.value);
+        });
+
+
+        function uuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = (Math.random() * 16) | 0,
+                    v = c == 'x' ? r : (r & 0x3) | 0x8;
+                return v.toString(16);
+            });
+        }
+        /** Interactive functions */
+        function onSubmit(){
+            if(selectedMemo.value.id) {
+                updateMemo().then(data => {
+                    console.log("Updated memo", data)
+                    // selectedMemo.value = data
+                    const findIndex = memos.value.findIndex(mem=>mem.id === selectedMemo.value.id);
+                    memos.value.splice(findIndex,1,data)
+                })
+                .catch(error => {
+                    console.error('Error adding new memo :', error);
+                    isLoading.value = false;
+                });;
+            }else{
+                addMemo().then(data => {
+                    console.log("New memo", data)
+                    memos.value.push(data)
+                    // memos.value.filter(memo=>memo.category_id == selectedCategory.id).push(data)
+                    console.log('Added memos', memos.value)
+                })
+                .catch(error => {
+                    console.error('Error adding new memo :', error);
+                    isLoading.value = false;
+                });;
+            }
+        }
+        // handleOnNew
+        function onNewItem() {
+            disabledFields.value = false;
+            selectedMemo.value = {id:"",category_id:"",title:"",content:""}
+        }
+        // Function to handle login button click
+        function handleLogin() {
+        if (isTokenValid.value) {
+            // Disable token input and login button
+            isLoading.value = true;
+            accessToken.disabled = true;
+            // loginButton.disabled = true;
+            // Send request to list categories
+            listCategories();
+        }
+        }
+        // Editing Memo
+        function editMemo(memoId){
+            // selectedMemo.value = memo;
+            // console.log("Editing", memo)
+            // console.log("Editing", selectedMemo)
+            disabledFields.value = false;
+            fetchSingleMemoList(memoId)
+                .then(data => {
+                    selectedMemo.value = data;
+                    isLoading.value = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching memos:', error);
+                    isLoading.value = false;
+                });
+        }
+        // Detect to show memos
+        function toggleCategory(category) {
+            activeCategory.value = activeCategory.value === category ? null : category;
+        }
+        function isActive(category) {
+            return selectedCategory.value === category;
+        }
+
+        function selectCategory(category) {
+            // selectedCategory.value = category;
+            selectedCategory.value = activeCategory.value === category ? null : category;
+            memos.value = []
+            listMemos(category.id);
+            // selectedMemo.value = {}
+            console.log("SelectCategory: ", category)
+            console.log("SelectCategory: ", selectedCategory)
+        }
+        /** System functions */
+        // Listing Categories
+        function listCategories() {
+            isLoading.value = true;
+            fetchCategoryList()
+                .then(data => {
+                    categories.value = data;
+                    isLoading.value = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching category list:', error);
+                    isLoading.value = false;
+                });
+        }
+        // Updating memo
+        function updateMemo() {
+            console.log("FORMREF: ", formRef.value)
+            if (formRef.value && !formRef.value.validate()) return;
+            // if(this.$refs.form.validate()) return;
+            console.log(selectedMemo.value)
+            return fetch(`https://challenge-server.tracks.run/memoapp/memo/${selectedMemo.value.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-ACCESS-TOKEN': accessToken.value
+            },
+            body: JSON.stringify({
+              category_id: selectedCategory.value.id,
+              title: selectedMemo.value.title,
+              content: selectedMemo.value.content
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to update memo');
+              }
+              return response.json();
+            });
+        }
+        // Fetching categories
+        function fetchCategoryList() {
+            return fetch('https://challenge-server.tracks.run/memoapp/category', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-ACCESS-TOKEN': accessToken.value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch category list');
+                    }
+                    return response.json();
+                });
+        }
+        // Listing memos
+        function listMemos(categoryId) {
+            isLoading.value = true;
+            fetchMemoList(categoryId)
+                .then(data => {
+                    console.log("Fetched Memo List", data)
+                    memos.value = data;
+                    isLoading.value = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching memos:', error);
+                    isLoading.value = false;
+                });
+        }
+        // Fetching memos
+        function fetchMemoList(categoryId) {
+            return fetch(`https://challenge-server.tracks.run/memoapp/memo?category_id=${categoryId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-ACCESS-TOKEN': accessToken.value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch memo list');
+                    }
+                    return response.json();
+                });
+        }
+        // Fetching single memo
+        function fetchSingleMemoList(memoId) {
+            return fetch(`https://challenge-server.tracks.run/memoapp/memo/${memoId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-ACCESS-TOKEN': accessToken.value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch memo list');
+                    }
+                    return response.json();
+                });
+        }
+        // Add new memo
+        function addMemo() {
+            if (formRef.value && !formRef.value.validate()) return;
+            // if(this.$refs.form.validate()) return;
+          return fetch('https://challenge-server.tracks.run/memoapp/memo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-ACCESS-TOKEN': accessToken.value
+            },
+            body: JSON.stringify({
+              category_id: selectedCategory.value.id,
+              title: selectedMemo.value.title,
+              content: selectedMemo.value.content
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to add memo');
+              }
+              return response.json();
+            });
+        }
+
+        // onMounted(listCategories);
+        return {
+            drawer,
+            isLoading,
+            activeCategory,
+            disabledFields,
+            accessToken,
+            isTokenValid,
+            handleLogin,
+            categories,
+            selectedCategory,
+            memos,
+            selectCategory,
+            selectedMemo,
+            editMemo,
+            updateMemo,
+            addMemo,
+            onNewItem,
+            toggleCategory,
+            isActive,
+            formRef,
+            onSubmit
+        }
+    }
+})
+app.use(vuetify);
+app.mount("#app");
+```
+
+## Final Answer 
+index.html
+```javascript
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet" />
+  <!-- <link href="https://cdn.jsdelivr.net/npm/vuetify@3.0.5/dist/vuetify.min.css" rel="stylesheet" /> -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vuetify@3.0.5/dist/vuetify.min.js"></script> -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="app">
+    <nav id="nav-bar">
+      <a href="#"><i class="fa-brands fa-github"></i></a>
+      <ul id="nav-ul">
+        <li id="nav-li">
+          <input type="text" id="access_token" v-model="accessToken" :disabled="isLoading">
+        </li>
+        <li id="nav-li">
+          <button id="login" :disabled="!isTokenValid || isLoading" @click="onLogin">LOGIN</button>
+        </li>
+      </ul>
+    </nav>
+    <div class="container">
+      <ul class="expandable-list">
+        <li v-for="(category,index) in categories" :key="index"  :id="'category-' + category.id" @click.stop="onSelectCategory(category)">
+          <div class="expandable-item" :class="{'active':selectedCategory?.id==category.id}"
+             :id="'category-' + category.id + '-title'">
+            <div class="expandable-header">
+              <span class="mdi mdi-folder"></span>{{category.name.trim()}}<span class="mdi mdi-menu-down"></span>
+              <!-- <div class="expandable-icon">
+                <div class="line"></div>
+                <div class="line"></div>
+              </div> -->
+            </div>
+            <ul class="expandable-body" v-if="selectedCategory&&selectedCategory.memos">
+              <li v-for="(item, i) in category.memos" :key="i" @click.stop="onEditMemo(item.id)" :id="'memo-'+item.id">
+                <span class="mdi mdi-file"></span>{{item.title}}
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <button id="new-memo" :disabled="!selectedCategory?.id"  @click.stop="onNewMemo">New</button>
+        </li>
+      </ul>
+      <form action="" class="card" @submit.prevent="onUpdateMemo">
+        <input type="text" placeholder="Title" v-model="selectedMemo.title" id="memo-title" :disabled="disabledFields">
+        <textarea placeholder="Content" v-model="selectedMemo.content" id="memo-content"
+          :disabled="disabledFields"></textarea>
+        <button id="save-memo" type="submit">Save {{selectedCategory?.id}}</button>
+        <button id="delete-memo" @click.stop="onDeleteMemo" :disabled="!selectedMemo?.id" type="button">Delete</button>
+      </form>
+    </div>
+    </main>
+  <script src="index.js"></script>
+</body>
+</html>
+```
+index.js
+```javascript
+
+
+const { createApp, ref,computed } = Vue;
+const app = createApp({
+    el: "#app",
+    setup() {
+        const isLoading = ref(false);
+        const disabledFields = ref(true);
+        const accessToken = ref(uuid());
+        const categories = ref([]);
+        const selectedCategory = ref({memos:[]});
+        const selectedMemo = ref({ id:"",category_id:"",title: "", content: "" }); // Ensure selectedMemo has a title property
+        const isTokenValid = computed(() => {
+        const tokenPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+        return tokenPattern.test(accessToken.value);
+        });
+
+        function uuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = (Math.random() * 16) | 0,
+                    v = c == 'x' ? r : (r & 0x3) | 0x8;
+                return v.toString(16);
+            });
+        }
+        /** Interactive functions */
+        function onUpdateMemo(){
+            if(selectedMemo.value.id) {
+                updateMemo().then(data => {
+                    const findIndex = selectedCategory.value.memos.findIndex(mem=>mem.id === selectedMemo.value.id);
+                    selectedCategory.value.memos.splice(findIndex,1,data)
+                })
+                .catch(error => {
+                    console.error('Error adding new memo :', error);
+                });;
+            }
+        }
+        // handleDelete
+        function onDeleteMemo(){
+            deleteMemo().then(data => {
+                const findIndex = selectedCategory.value.memos.findIndex(mem=>mem.id === selectedMemo.value.id);
+                if (findIndex !== -1) {
+                    selectedCategory.value.memos.splice(findIndex, 1);
+                }
+            })
+            .catch(error => {
+                console.error('Error adding new memo :', error)
+            });
+        }
+        // handleOnNew
+        function onNewMemo() {
+            disabledFields.value = false;
+            selectedMemo.value = {id:"",category_id:selectedCategory.id,title:"New Memo",content:""}
+            addMemo().then(data => {
+                // selectedCategory.value = categories.value.find(cat=>cat.id === data.category_id)
+                delete data.category_id;
+                selectedMemo.value = data 
+                selectedCategory.value.memos?.push(data);
+            })
+            .catch(error => {
+                console.error('Error adding new memo :', error)
+            });
+        }
+        // Function to handle login button click
+        function onLogin() {
+            // Disable token input and login button
+            isLoading.value = true;
+            if (isTokenValid.value) {
+                accessToken.disabled = true;
+                // Send request to list categories
+                listCategories();
+            }
+        }
+        // Editing Memo
+        function onEditMemo(memoId){
+            disabledFields.value = false;
+            fetchSingleMemoList(memoId)
+                .then(data => {
+                    selectedMemo.value = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching memos:', error);
+                });
+        }
+        function onSelectCategory(category) {
+            selectedCategory.value.memos = []
+            selectedCategory.value = selectedCategory.value == category ? null : category;
+            if(selectedCategory.value) {
+                listMemos(category.id);
+            }
+        }
+        // Listing Categories
+        function listCategories() {
+            isLoading.value = true;
+            fetchCategoryList()
+                .then(data => {
+                    categories.value = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching category list:', error);
+                });
+        }
+        // Updating memo
+        function updateMemo() {
+            return fetch(`https://challenge-server.tracks.run/memoapp/memo/${selectedMemo.value.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-ACCESS-TOKEN': accessToken.value
+            },
+            body: JSON.stringify({
+              category_id: selectedCategory.value.id,
+              title: selectedMemo.value.title,
+              content: selectedMemo.value.content
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to update memo');
+              }
+              return response.json();
+            });
+        }
+        // Fetching categories
+        function fetchCategoryList() {
+            return fetch('https://challenge-server.tracks.run/memoapp/category', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-ACCESS-TOKEN': accessToken.value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch category list');
+                    }
+                    return response.json();
+                });
+        }
+        // Listing memos
+        function listMemos(categoryId) {
+            isLoading.value = true;
+            fetchMemoList(categoryId)
+                .then(data => {
+                    selectedCategory.value.memos = data
+                })
+                .catch(error => {
+                    console.error('Error fetching memos:', error);
+                });
+        }
+        // Fetching memos
+        function fetchMemoList(categoryId) {
+            return fetch(`https://challenge-server.tracks.run/memoapp/memo?category_id=${categoryId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-ACCESS-TOKEN': accessToken.value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch memo list');
+                    }
+                    return response.json();
+                });
+        }
+        // Fetching single memo
+        function fetchSingleMemoList(memoId) {
+            return fetch(`https://challenge-server.tracks.run/memoapp/memo/${memoId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-ACCESS-TOKEN': accessToken.value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch memo list');
+                    }
+                    return response.json();
+                });
+        }
+        // Add new memo
+        function addMemo() {
+          return fetch('https://challenge-server.tracks.run/memoapp/memo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-ACCESS-TOKEN': accessToken.value
+            },
+            body: JSON.stringify({
+              category_id: selectedCategory.value.id,
+              title: selectedMemo.value.title,
+              content: selectedMemo.value.content
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to add memo');
+              }
+              return response.json();
+            });
+        }
+        // delete Memo
+        function deleteMemo() {
+          return fetch(`https://challenge-server.tracks.run/memoapp/memo/${selectedMemo.value.id}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-ACCESS-TOKEN': accessToken.value
+            }
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to delete memo');
+              }
+            });
+        }
+        return {
+            isLoading,
+            disabledFields,
+            accessToken,
+            isTokenValid,
+            onLogin,
+            categories,
+            selectedCategory,
+            onSelectCategory,
+            selectedMemo,
+            onEditMemo,
+            onNewMemo,
+            onUpdateMemo,
+            onDeleteMemo
+        }
+    }
+})
+app.mount("#app");
+```
+
+style.css 
+```css 
+#app{
+    display: flex;
+    flex-direction: column;
+}
+#nav-bar{
+    position:sticky;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin: 0 auto ;
+    background-color: aquamarine;
+    height: 80px;
+    width: 100%;
+}
+li{
+    list-style-type: none;
+    font-size: 1.27rem;
+}
+#nav-ul li {
+    display: inline;
+    margin: 16px;
+}
+.container{
+    display: flex;
+    justify-content: space-around;
+    padding: 12px;
+}
+.expandable-list{
+    /* margin: 20px auto; */
+    width: 50%;
+    overflow-y: auto;
+    transition: 0.4s;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+.card{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.expandable-item {
+    background: white;
+    box-sizing: border-box;
+    padding: 10px;
+    min-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 4px grey;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    cursor: pointer;
+}
+
+.expandable-item:first-of-type{
+    border-radius: 5px 5px 0 0;
+}
+
+.expandable-item:last-of-type{
+    border-radius: 0 0 5px 5px;
+
+}
+
+.expandable-header {
+    position: relative;
+    height: 30px;
+    font-weight: bolder;
+}
+
+.expandable-icon {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    transform: rotateZ(45deg);
+    border-radius: 5px;
+    width: 25px;
+    height: 25px;
+    background: rgb(12, 47, 94);
+    transition: all .3s;
+}
+
+.expandable-item.active .expandable-icon{
+    transform: rotateZ(0);
+}
+
+.expandable-icon .line {
+    width: 15px;
+    height: 2px;
+    background: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    transition: all .4s;
+}
+
+.expandable-icon .line:nth-child(1) {
+    transform: rotateZ(45deg);
+}
+
+.expandable-icon .line:nth-child(2) {
+    transform: rotateZ(-45deg);
+}
+
+.expandable-item .expandable-body {
+    background: rgba(144, 219, 219, 0.377);
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 0 1em;
+    transition: all .5s ease-in-out;
+    height: 0px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.expandable-item.active .expandable-body {
+    margin-top: 5px;
+    height: 50px;
+}
+
+.expandable-item.active .expandable-icon .line:nth-child(1) {
+    transform: rotateZ(0deg);
+}
+
+.expandable-item.active .expandable-icon .line:nth-child(2) {
+    transform: rotateZ(180deg);
+}
+```

@@ -9,7 +9,7 @@ import {
 export const socialData = [
     {
         name: "LinkedIn",
-        link: "https://www.linkedin.com/in/kyawye-naing-099970104/",
+        link: "https://www.linkedin.com/in/kyaw-ye-naing-099970104/",
         Icon: RiLinkedinLine,
     },
     {

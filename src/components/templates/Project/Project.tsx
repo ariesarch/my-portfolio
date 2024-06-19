@@ -8,7 +8,7 @@ import Bulb from "@/components/atoms/Bulb";
 import WorkSlider from "@/components/atoms/WorkSlider";
 import { useState } from "react";
 import { SelectedProject } from "@/utils/constants";
-import { Container } from "@/components/Container";
+import { BaseContainer } from "@/components/BaseContainer";
 import { Brain } from "@/components/atoms/Brain";
 import { Neurons } from "@/components/atoms/Neurons";
 
@@ -25,7 +25,7 @@ const Project = () => {
         setSelectedProject(projectOverview);
     }
     return (
-        <Container className="flex flex-col xl:flex-row gap-2">
+        <BaseContainer className="flex flex-col xl:flex-row gap-2">
             <motion.div
                 variants={fadeIn("down", 0.6)}
                 initial="hidden"
@@ -62,7 +62,7 @@ const Project = () => {
             </div>
             <Bulb handleClick={resetProjectOverview} className="hidden md:block lg:block right-2 bottom-1 -rotate-45"/>
             <Bulb handleClick={resetProjectOverview} className="hidden md:block lg:hidden left-2 bottom-1 rotate-45"/>
-        </Container>
+        </BaseContainer>
     );
 };
 

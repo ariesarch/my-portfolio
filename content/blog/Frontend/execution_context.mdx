@@ -1,0 +1,211 @@
+---
+title: Execution Context
+description: Execution Context
+published: true
+category: frontend
+date: 2023-12-05
+---
+
+
+## What is Exection Context? 
+
+JavaScript Run Time မှာ ရေးထားတဲ့ code ကို ဘယ်ထဲက ဘာကို ဘယ်လို အဆင့်အဆင့်လုပ်ဆောင်မလဲဆိုတာ စီစဉ်နေရာချ သတ်မှတ်ခြင်းဖြစ်ပါတယ်။
+JavaScript code run 
+
+## Why Exection Context in JS?
+
+### 1. Variable Scope Management: 
+
+**1.1. Explanation:** Execution context facilitates proper scoping of variables within JavaScript. 
+Each execution context has its own variable environment, which contains **variables, function declarations, and arguments scoped to that context.**
+
+This ensures that variables are accessible only within their appropriate scope and prevents unintended variable collisions.
+
+**1.2. Example:** When a function is invoked, a new execution context is created, and variables declared inside that function are scoped to that context. This prevents them from conflicting with variables of the same name in other parts of the code.
+
+
+```JavaScript
+function outerFunction() {
+    var outerVariable = 'I am in the outer function';
+
+    function innerFunction() {
+        var innerVariable = 'I am in the inner function';
+        console.log(outerVariable); // Access outer variable
+        console.log(innerVariable); // Access inner variable
+    }
+
+    innerFunction();
+}
+
+outerFunction();
+```
+
+### 2. Lexical Scope Chain:
+
+**2.1. Explanation:** Execution context establishes the lexical scope chain, which allows inner functions to access variables from their outer enclosing scopes. This mechanism, known as lexical scoping, enables functions to capture and utilize variables from their surrounding context.
+This mechanism enables code organization and promotes code reuse. When a function is defined, it retains access to variables from the surrounding scope, even if it is executed elsewhere. Lexical scoping is a powerful feature of JavaScript, and execution context plays a crucial role in implementing it.
+
+
+**2.2. Example:** In a nested function, the inner function can access variables declared in the outer function because of the lexical scope chain. This enhances code modularity and promotes the reuse of variables across different scopes.
+
+### 3. This Binding:
+
+**3.1. Explanation:** The this keyword in JavaScript is dynamically scoped and determined by the execution context in which a function is called. Execution context plays a crucial role in determining the value of this, which can vary depending on how a function is invoked (e.g., as a method, with call or apply, or as a constructor).
+
+**3.2. Example:** In an object method, this refers to the object that invoked the method. Understanding the execution context helps in correctly identifying the value of this within different parts of the code.
+
+The value of the this keyword in JavaScript is dynamically determined by the execution context in which a function is called. Execution context determines the value of this based on how a function is invoked. Understanding execution context is essential for correctly identifying the value of this within different parts of the code. This enables context-aware behavior within functions and is vital for object-oriented programming in JavaScript.
+
+### 4. Function Execution:
+
+**4.1. Explanation:** Each function invocation creates a new execution context, which manages the execution of that function. This includes handling parameters, local variables, and the return value of the function.
+
+**4.2. Example:** When a function is called, the JavaScript engine creates an execution context for that function, allocates memory for its variables, and manages its execution until it completes or returns a value. This ensures proper isolation and execution of function code.
+Execution context manages the execution of functions, including handling parameters, local variables, and the return value of the function. When a function is invoked, a new execution context is created, which manages the execution of that function. This ensures proper isolation and execution of function code, facilitating modular and maintainable code.
+
+### 5. Error Handling: 
+
+**5.1. Explanation:** Execution context is crucial for error handling in JavaScript. When an error occurs during the execution of code, the JavaScript engine uses the execution context stack (the call stack) to track where the error occurred and to determine how to handle it.
+
+**5.2. Example:** If an error occurs within a function, the JavaScript engine can trace the error back to the specific execution context in which it occurred, aiding in debugging and error resolution.
+
+Execution context is crucial for error handling in JavaScript. When an error occurs during the execution of code, the JavaScript engine uses the execution context stack (the call stack) to track where the error occurred and to determine how to handle it. Understanding execution context aids in debugging and error resolution by providing insights into the context in which errors occur.
+
+### 6. Asynchronous Code Execution
+
+**6.1. Explanation:** Understanding execution context is vital when dealing with asynchronous code, such as callbacks, promises, and async/await. Asynchronous operations rely on the event loop, which utilizes execution contexts to manage the order of execution for asynchronous tasks.
+
+**6.2 Example:** When asynchronous code is executed, it may be placed in the event queue and executed later, depending on the availability of the execution context. This ensures that asynchronous operations do not block the main execution thread, allowing for non-blocking, asynchronous behavior.
+
+Execution context is essential for managing asynchronous code execution in JavaScript. Asynchronous operations, such as callbacks, promises, and async/await, rely on the event loop, which utilizes execution contexts to manage the order of execution for asynchronous tasks. Execution context ensures that asynchronous operations are executed in the correct order without blocking the main execution thread, enabling non-blocking, asynchronous behavior.
+
+
+### 1. Variable Scope Management
+Variable scope management is critical in JavaScript because it ensures that variables are accessible only within their appropriate scopes, preventing unintended conflicts and promoting code clarity and modularity. Here's a detailed explanation of why and how variable scope management is important in the context of execution in JavaScript:
+
+## 1. Preventing Variable Collisions:
+
+**1.1. Explanation:** Each execution context in JavaScript has its own variable environment, which contains variables, function declarations, and arguments scoped to that context. This ensures that variables declared within a specific scope do not conflict with variables of the same name in other parts of the code.
+
+**1.2. Example:** If a variable named count is declared within a function, it will not conflict with another variable named count declared in a different function or global scope. This prevents unintended side effects and makes code more maintainable.
+
+### 2. Encapsulation and Modularity:
+
+**2.1. Explanation:** Proper variable scoping allows for encapsulation and modularity in JavaScript code. Variables declared within a function are only accessible within that function's scope, encapsulating their behavior and preventing them from affecting other parts of the code.
+
+**2.2. Example:** Encapsulating variables within functions helps in creating reusable and modular code. Functions can be treated as black boxes, with their internal variables hidden from the outside world, promoting code abstraction and reducing complexity.
+
+### 3. Avoiding Global Namespace Pollution:
+
+**3.1. Explanation:** Without proper variable scoping, variables declared in the global scope can unintentionally overwrite or be overwritten by variables from different parts of the code. This can lead to namespace pollution and conflicts, making code difficult to understand and maintain.
+
+**3.2. Example:** If multiple scripts declare variables in the global scope with common names like data or result, they may inadvertently interfere with each other's functionality. Proper scoping confines variables to their respective execution contexts, mitigating the risk of namespace pollution.
+
+### 4. Closure and Function-Level Scope:
+
+**4.1. Explanation:** JavaScript's function-level scope allows for the creation of closures, which are functions that have access to variables from their enclosing scope even after the enclosing function has finished executing. Proper variable scoping is essential for creating and maintaining closures.
+
+**4.2. Example:** In a closure, an inner function retains access to variables from its outer function's scope, even after the outer function has returned. This enables powerful programming patterns like memoization, currying, and maintaining state in event handlers.
+
+### 5. Improved Code Readability and Debugging:
+
+**5.1. Explanation:** Well-defined variable scopes improve code readability by making it clear where variables are declared and how they are accessed within the code. This facilitates easier debugging and troubleshooting, as developers can quickly identify where variables are defined and determine their intended scope.
+
+**5.2. Example:** By following best practices for variable scoping, such as avoiding global variables and using block-level scope introduced by let and const, developers can write code that is easier to understand, debug, and maintain.
+
+In summary, proper variable scope management in JavaScript ensures that variables are scoped appropriately, preventing conflicts, promoting code modularity, encapsulation, and readability, and enabling powerful programming patterns like closures. 
+Understanding and mastering variable scope is essential for writing clean, maintainable, and bug-free JavaScript code.
+
+
+## How Execution Context Work?
+
+Javascript engine က JavaScript code ကို scan လုပ်တဲ့အခါမှာ Execution Context တခုကို ဖန်တီးလိုက်ပါတယ်။
+ဘာအတွက်လဲဆိုရင် code တွေကို transform လုပ်ပြီး execution လုပ်ဖို့ဖြစ်ပါတယ်။
+
+Exection Context ထဲမှာ parser က JavaScript code parse လုပ်ပြီး functions,variables တွေကို memory allocates လုပ်ပါတယ်။
+ပြီးရင် executable byte code ထုတ်ပါတယ်။ပြီးမှ execute လုပ်ပါတယ်။
+
+
+## Types of Execution Context 
+
+### Global Execution Context 
+ သူကတော့ အထက်ကပြောခဲ့တဲ့ execution context အလုပ်လုပ်ပုံနဲ့တူပါတယ်။
+ Js file တခုကို JavaScript Engine က ဖတ်တဲ့အခါမှာ file တခုလုံးအတွက် execution context တခု ဖန်တီးလိုက်ပါတယ်။
+ ဒါက file ထဲမှာ ပါတဲ့ function တွေ အတွက်မဟုတ်သေးပါဘူး။ file တခုလုံးအတွက် လုပ်ပေးတာဖြစ်ပါတယ်။
+ js file တခုမှာ GEC တခုစီ ရှိပါတယ်။
+
+### Function Execution Context 
+
+Js Function တခုကို invoke လုပ်တဲ့အခါမှာလည်း အဲဒီ function run ဖို့အတွက် GEC အတွင်းမှာ FEC function execution context တခု ဖန်တီးလိုက်ပါတယ်။
+FEC ကတော့ function invoke လုပ်တိုင်းမှာ ဖန်တီးတာကြောင့် တခုထက်ပိုပြီးရှိနိုင်ပါတယ်။
+
+
+## How are Exection Context created?
+
+Exection Context တခုမှာ Creation Phase နဲ့ Execution Phase ဆိုပြီး ၂ ပိုင်း ခွဲခြမ်းကြည့်လို့ရပါတယ်။
+
+### Creation Phase 
+ဒီအဆင့်မှာ 
+1. Creation of Variable Object (VO)
+2. Creation of Scope Change 
+3. Setting the value of `this` keyword 
+ဆိုပြီး အဆင့် (၃) ဆင့် ထပ်ရှိပါတယ်။ 
+
+### 1. Creation of Variable Object(VO)
+JavaScript code variables,functions တွေကို Exection Context ထဲမှာ သိမ်းဆည်းတဲ့ အလုပ်ဖြစ်ပါတယ်။
+GEC ထဲမှာဆိုရင် ဒီလို variables,functions တွေကို သက်ဆိုင်ရာ property နဲ့တွဲပြီး memory ပေါ်မှာ သိမ်းဆည်းပေးထားပါတယ်။
+FEC ကတော့ ဒီလို VO လုပ်မပေးတော့ပါဘူး။​ function နဲ့ သက်ဆိုင်တဲ့ arguments object တခုကို ထုတ်ပေးပါတယ်။
+
+ဒီလို variables,functions တွေကို code execution မလုပ်ခင် memory allocates လုပ်တာကို Hosting လို့ခေါ်ကြပါတယ်။
+
+**var keyword နဲ့ ကြေငြာထားတဲ့ variable တွေကိုဆိုရင် VO ထဲမှာ 'undefined' အဖြစ်နဲ့ top of current scope သိမ်းဆည်းပေးပါတယ်**
+
+```JavaScript
+console.log(x);
+var x =0;
+```
+**greet() function ကို invoke မလုပ်ခင်ကထဲက VO မှာ သိမ်းထားပြီးဖြစ်ပါတယ်**
+```
+greet(); 
+function greet() {
+    console.log("Hello!");
+}
+```
+**function expression နဲ့ ရေးထားတာကိုတော့ သူက host မလုပ်နိုင်ပါဘူး။**
+```JavaScript
+getAge(1990); 
+var getAge = function (yearOfBirth) {
+    console.log(new Date().getFullYear - yearOfBirth) 
+};
+```
+
+### 2. Creation of the Scope Change 
+
+ဒီအဆင့်မှာတော့ ဘယ် variables,functions တွေဟာ ဘယ်နေရာကနေ အသုံးပြုလို့ရတယ်ဆိုတာ သတ်မှတ်ပါတယ်။ 
+JavaScript first-class citizen ရှိတာကြောင့် function တွေကို invoke လုပ်တဲ့အခါ ဆိုင်ရာအလိုက် လုပ်ဆောင်သွားဖို့ အတွက် scope ကို သတ်မှတ်ပေးရပါတယ်။
+
+
+```JavaScript
+var greeting = "Hello"
+first();
+function first() {
+    var country = "Thailand"
+    second();
+    function second(param) {
+        var name = "John"
+        console.log(greeting,country,", My name is ", name);
+    }
+}
+```
+
+greeting global scope ထဲမှာ ရှိတဲ့ global variable ဖြစ်ပါတယ်။
+country ကတော့ first function အတွင်းထဲက function scope အတွင်းက local variable ဖြစ်ပါတယ်။
+name ကတော့ second function ရဲ့ local variable ဖြစ်ပါတယ်။ 
+
+Scope Chain ဆိုတာကတော့ ဒီိလို scope တွေရဲ့ hierarchy ကို သတ်မှတ်တဲ့ mechanism ဖြစ်ပါတယ်။​
+second အထဲမှာ greeting variable ကိုခေါ်သုံးထားပါတယ်။ 
+သူက second function အထဲမှာ ကြေငြာမထားတဲ့ variable ဖြစ်ပါတယ်။ 
+ဒီအချိန်မှာ JavaScript Engine က greeting ကို second အထဲမှာ ရှိသလား အရင်ရှာပါတယ်။မရှိပါဘူး။
+ဒီတော့ second ရဲ့ outer function first ထဲမှာ ထပ်ကြည့်ပါတယ်။ မရှိပါဘူး။
+ဒီတခါတော့ Global Scope ထဲမှာ ထပ်ရှာပါတယ်။ အဲဒီမှာ တွေ့တဲ့ variable ကို access လုပ်ပြီး သုံးလိုက်တာပါ။
+

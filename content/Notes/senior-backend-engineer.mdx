@@ -1,0 +1,1629 @@
+---
+title: Senior Backend Engineer Questions and Answers
+description: Senior Backend Engineer Questions and Answers
+published: true
+category: interview
+date: 2023-12-05
+---
+
+## Example
+
+### Question
+
+Given an arbitrary string \\( s \\), implement a program that outputs the following:
+
+```JavaScript
+"Hello {s}!"
+```
+
+`` For example, the program should output `Hello World!` when the input is `World`, and should output `Hello track!` when the input is `track`. ``
+
+## Implementation
+
+### CLI
+
+Implement a command line application that receives standard input and writes the answer to its standard output.
+For details, see the Command line application template section at the bottom of the page.
+
+### Input Rules
+
+Your CLI program should receive input from stdin.
+
+The format of the standard input is as follows:
+
+```plain
+s
+```
+
+- The length of \\( s \\) is between \\( 1 \\) and \\( 20 \\), inclusive.
+- \\( s \\) consists of only lowercase letters, uppercase letters, and numbers.
+
+### Output Rules
+
+Your CLI program should return an output as stdout.
+
+The format of the standard output is as follows:
+
+```plain
+Hello {s}!
+```
+
+- \\( s \\) is the string from the input.
+
+## Input & Output Examples
+
+### Example 1
+
+stdin
+
+```plain
+World
+```
+
+stdout
+
+```plain
+Hello World!
+```
+
+### Example 2
+
+stdin
+
+```plain
+track
+```
+
+stdout
+
+```plain
+Hello track!
+```
+
+There are other input & output examples defined in this file: [test/basic_testcases.json](test/basic_testcases.json)
+You can use it as a reference while working on this exercise.
+
+### Answer
+
+```JavaScript
+<?php
+
+namespace Track;
+
+ini_set("memory_limit", -1);
+
+function main($lines)
+{
+  foreach ($lines as $index => $value) {
+    // Original code to print each line
+    // printf("line[%s]: %s\n", $index, $value);
+
+    // New code to solve the challenge
+    $output = "Hello $value!\n";
+    fwrite(STDOUT, $output);
+  }
+}
+
+$array = array();
+while (true) {
+  $stdin = fgets(STDIN);
+  if ($stdin == "") {
+    break;
+  }
+  $array[] = rtrim($stdin);
+}
+main($array);
+```
+
+## Task One
+
+You are to create a restaurant reservation system for use by multiple restaurants. A restaurant may list or remove its own restaurant in this system. A user can send a reservation request to any of the listed restaurants, and the reservation is officially made after the restaurant confirms the request.
+
+# Rough Specifications
+
+The reservation system allows a **user** to send a **reservation request** to a **restaurant**, specifying the number of people, date and time. The process of making a reservation in this system is as follows:
+
+- A user first sends a reservation request to a restaurant to inform it of the number of people, date and time.
+- The restaurant aims to **confirm** the reservation request within the next business day.
+- Once the restaurant confirms the reservation request, the reservation is successfully made.
+  Conversely, if the reservation request is **rejected** by the restaurant, or if it is neither confirmed nor rejected by the next business day and the reply has **expired**, the reservation will not be confirmed.
+
+In order to prevent last minute bookings or reservations that are too far in advance, each restaurant pre-sets a **reservation period** during which it accepts reservation requests. The reservation period is specified such that the reservation date must be from \\(A\\) to \\(B\\) days (inclusive) after the date when a reservation request is sent. During the reservation period, a user may cancel, unconditionally, a previously confirmed reservation and a reservation request that is awaiting confirmation. The system does not automatically handle cancellations outside the reservation period, but rather displays restaurant contact information so users can contact the restaurant directly.
+
+The system receives input from the standard input and outputs the results of requests (reservation, confirmation, etc.) to the standard output. The first input to the system is the number of restaurants listed from the beginning, with the information for each restaurant. Next, a number of **queries** are sent to the system by users and restaurants. There are several types of queries, including
+
+- A **REQUEST** query for a user to send a reservation request to the restaurant
+- A **CONFIRM** query for a restaurant to confirm the booking request
+- A **NEXT_DAY** query to let the system know that the business day is over
+
+Those are the rough specifications, but the precise format of each input has not yet been described in detail. Read the following detailed specifications and create a program to implement the system.
+
+# Scoring
+
+As the system to be built is complex, there are **basic test cases** which aim to score the most basic functionality. The program can be simplified by skipping most of the complex requirements when you try to pass only the basic test cases. It is recommended that candidates **first write a program to attempt to pass the basic test cases before starting on the rest of the test cases**, although candidates are allowed to write a program to attempt to pass all test cases right from the start.
+
+The basic test cases satisfy the following restrictions to simplify the problem:
+
+- Only REQUEST, CONFIRM and NEXT_DAY queries are given. Therefore,
+  - A reservation will not be cancelled by a user nor be rejected by the restaurant.
+  - Restaurants will not temporarily stop receiving reservations.
+  - Restaurants will not list or remove themselves in the middle of the process.
+- There is only one restaurant. The restaurant is open 24/7.
+
+The requirements that need to be read to implement a program to pass the basic test cases are labeled (Basic) in the "Detailed Specifications" section. In contrast, the advanced test cases require all the queries to be implemented.
+
+As secret test cases are run after you submit your program, note that the final result may not be a perfect score even if you get a perfect score with the public test cases. Make sure the program is free of bugs even if you get a perfect score on the public test cases.
+
+# Detailed Specifications
+
+## Time (Basic, Advanced)
+
+- The **time** is in the form of the hourly system of `hh:mm` (`00:00`\\(\le\\)`hh:mm`\\(\le\\)`24:00`).
+
+  - `24:00` appears only to express the end of a time range.
+
+- A **time range** is composed of a start time and an end time concatenated by `-` (hyphen).
+
+  - The end time must be a time after the start time.
+  - Time \\(t\\) is included in a time period if and only if time \\(t\\) is exactly at or after the start time and before the end time. Note that exactly at the start time **is** included in the time range but the end time **is not** included.
+
+- A date is expressed as an integer.
+  - Date \\(n+1\\) is the day after date \\(n\\).
+  - The date \\(1\\) is assumed to be a Monday.
+- At the beginning of the program, the date is \\(1\\).
+  - The date is incremented by one each time a **NEXT_DAY** query, described below, is sent.
+- For a given date, the “next business day” for a restaurant is defined as the earliest date which falls after the given date and for which the restaurant has business hours.
+
+## Restaurant (Basic, Advanced)
+
+- Each restaurant is assigned **restaurant information** including the following data.
+
+  - **Restaurant ID**: A unique string of characters assigned to each restaurant, consisting of single-byte alphanumeric characters only and of not more than 20 characters in length.
+  - **Contact information**: a string that consists of only alphanumeric characters, `@`, `-`, `_` and `.`, no spaces, and has no more than 20 characters.
+  - **Reservation Period**: The period from \\(A\\) to \\(B\\) days before the date of the reservation (inclusive) during which reservation cancellations and reservation requests are accepted.
+  - **Minimum and maximum number of people in a reservation request (\\(Min\\), \\(Max\\))**: The number of people in a request must be between \\(Min\\) and \\(Max\\) (inclusive).
+  - **Business Hours**: Each restaurant will have at most \\(4\\) time ranges for business hours for each weekday. If the reservation date and time stated in a REQUEST query is outside the business hours, the reservation request will be rejected.
+
+- A **STOP** query allows restaurants to set up a date and a time range during which no reservations will be received, e.g., when the restaurant is temporarily full.
+  - The system rejects reservation requests for that time range.
+- A **CONFIRM** query allows restaurants to accept a reservation request. In contrast, through a **REJECT** query, restaurants can reject a reservation request.
+- A **LIST** query allows a new restaurant to list itself in the system. A **REMOVE** query allows a restaurant to remove itself from the system.
+
+## User (Basic, Advanced)
+
+- Each user is assigned a unique **user ID**.
+  - The user ID is an alphanumeric character string of no more than 20 characters.
+- The user sends a reservation request to the restaurant with a REQUEST query.
+
+- A **CANCEL** query allows users to cancel a reservation request that has already been confirmed or is waiting for confirmation or rejection, as long as it is sent within the reservation period of the restaurant.
+
+## Reservation Request (Basic, Advanced)
+
+- A reservation request consists of the following information
+  - A unique **reservation ID**: a string of lowercase letters and numeric characters only and no more than 20 characters in length
+  - Five pieces of information to represent "the user `UID` telling the restaurant `SID` the date, time, and number of people"
+  - A state to indicate the status of a reservation request:
+    - Pending: A reservation request that has neither been confirmed nor rejected by the restaurant after the user has sent it to the restaurant. Pending reservation requests that are later cancelled are not counted as pending.
+    - Confirmed: A reservation request that has been confirmed by the restaurant within the next business day after the reservation request was sent. Confirmed reservations that are later cancelled are excluded.
+    - Rejected: A reservation request that has been rejected by the restaurant or automatically rejected due to an expired confirmation period.
+    - Cancelled: A reservation request that has been cancelled by a user.
+
+# Input/Output
+
+## Restaurant Information (Basic, Advanced)
+
+- The initial number of restaurants is given in the first line (\\(1 \le n \le 100\\)).
+
+- Restaurant information is given in the next \\(8 \times n\\) lines.
+
+  - The first line of each piece of restaurant information is in the following format:
+
+    ```math
+    \(SID\) \(Contact\) \(A\) \(B\) \(Min\) \(Max\)
+    ```
+
+    - \\(SID\\): Restaurant ID
+    - \\(Contact\\): Contact information
+    - \\(A, B\\): Integers to express the range of the reservation period. The period from \\(A\\) to \\(B\\) days before the date of the reservation (inclusive) to accept reservation requests and cancellations. \\(1 \le B \le A \le 10\\)
+    - \\(Min, Max\\): Integers to set the minimum and maximum number of people allowed in a group per reservation request. \\(1 \le Min \le Max \le 10\\)
+
+  - From the second to eighth lines of each piece of restaurant information, at most \\(4\\) business hour periods (when reservations are accepted) on each day of the week are given, from Monday through Sunday. At least one day of the week has business hours. The format of a single line is as follows:
+    - If the day of the week is a day in which the restaurant is normally closed, only the character `-` (hyphen) is given.
+    - Otherwise, at most four time ranges that indicate a set of business hours are given, delimited by a single space.
+
+- After \\(n\\) sets of the restaurant information are input, a query is given on each following line.
+
+## Query
+
+After the reservation system is launched, queries performed on the reservation system are given in chronological order. There are eight types of queries: **REQUEST**, **CANCEL**, **CONFIRM**, **REJECT**, **STOP**, **NEXT_DAY**, **LIST** and **REMOVE**. Between 1 and 2000 (inclusive) queries are given.
+
+### Queries sent by users
+
+**REQUEST** (Basic, Advanced)
+A query for a user to request a reservation by informing a restaurant of the date, time, and number of people.
+
+- Input
+
+  ```plain
+  REQUEST {RID} {UID} {SID} {Date} {Time} {The number of people}
+  ```
+
+  - `REQUEST`: A string `REQUEST`
+  - `RID`: Reservation ID generated when this reservation request is sent.
+  - `UID`: User ID of the user requesting a reservation
+  - `SID`: Restaurant ID of the restaurant where the user is going to make a reservation.
+  - `Date`: The reservation date. Between \\(1\\) and \\(3000\\) inclusive.
+  - `Time`: The reservation time.
+  - `The number of people`: The number of guests on the reservation. Integer between \\(1\\) and \\(1000\\) inclusive.
+
+- Output
+  Check the following conditions in order from the top, and execute the process corresponding to the first condition that applies.
+
+  - If a non-existent restaurant ID is specified, print
+
+  ```plain
+  Error: No such restaurant
+  ```
+
+  - If the current date is not between \\(A\\) and \\(B\\) days (inclusive) before the reservation date, print
+
+  ```plain
+  Error: Outside of reservation period
+  ```
+
+  - If the date and time of the reservation are not included in the business hours, print
+
+  ```plain
+  Error: Closed
+  ```
+
+  - If the number of people booked is less than \\(Min\\) or greater than \\(Max\\), print
+
+  ```plain
+  Error: Too many or too few people
+  ```
+
+  - If the time and date of the reservation are included in a time range in which the restaurant has temporarily stopped receiving reservation requests, print
+
+  ```plain
+  Error: Reservations temporarily closed
+  ```
+
+  - otherwise
+    - The system **receives** the reservation request. Print the following string to send the information necessary for the restaurant to check if it can confirm the reservation request.
+      - `to:{SID} Received a reservation request: {RID} {UID} {Date} {Time} {The number of people}`
+    - A reservation confirmation or rejection is expected to be sent no later than the next business day (including the next business day) after the date the reservation request is sent. If neither acceptance nor rejection is received by the next business day, the reservation request will expire and its status will become rejected.
+
+- If errors occur, regard the request as non-existent in the system.
+
+**CANCEL**（Advanced）
+A query for cancelling a reservation request `RID` that is in a confirmed or pending status, sent by a user `UID`.
+
+- Input
+
+  ```plain
+  CANCEL {UID} {RID}
+  ```
+
+  - `CANCEL`: A string `CANCEL`
+  - `UID`: User ID.
+  - `RID`: Reservation ID.
+
+- Output
+  The following conditions are checked in order from the top, and the process corresponding to the first condition that applies is executed.
+  - If the reservation ID `RID` does not exist or is not associated with the user `UID`, print
+  ```plain
+  Error: Not found
+  ```
+  - If the restaurant on the reservation request you want to cancel has already been removed from the system, print
+  ```plain
+  Error: No such restaurant
+  ```
+  - If the reservation request’s state is rejected, print
+  ```plain
+  Error: Rejected
+  ```
+  - If the reservation request’s state is cancelled, print
+  ```plain
+  Error: Cancelled
+  ```
+  - If the current date is later than the reservation date, print
+  ```plain
+  Error: Past reservation
+  ```
+  - If the current date is not between \\(A\\) and \\(B\\) days before the reservation date (inclusive), print the contact information for the restaurant.
+  - otherwise
+    - Print `to:{SID} {RID} has been cancelled` to inform the restaurant `SID` (specified in the reservation request) that the reservation `RID` has been cancelled.
+    - After this, this reservation request `RID` will be considered to be cancelled.
+
+### Queries sent by restaurants
+
+**CONFIRM** (Basic, Advanced)
+A query for a restaurant `SID` to confirm a reservation request `RID`.
+
+- Input
+
+  ```plain
+  CONFIRM {SID} {RID}
+  ```
+
+  - `CONFIRM`: A string `CONFIRM`
+  - `SID`: Restaurant ID
+  - `RID`: Reservation ID
+
+- Output
+  The following conditions are checked from the top, and the process corresponding to the first condition that applies is executed.
+  - If a reservation ID does not exist or the reservation request `RID` is not for the restaurant `SID`, print
+  ```plain
+  Error: No such reservation ID
+  ```
+  - If the state of this reservation request `RID` is rejected, print
+  ```plain
+  Error: Already rejected
+  ```
+  - If the state of this reservation request `RID` is confirmed, print
+  ```plain
+  Error: Already confirmed
+  ```
+  - If the state of this reservation request `RID` is cancelled, print
+  ```plain
+  Error: Already cancelled
+  ```
+  - otherwise
+    - print `to:{UID} {RID} has been confirmed` to inform the user `UID` (specified in the reservation request) that the reservation has been accepted by the restaurant `RID`.
+    - After this, this reservation request `RID` will be considered to be in the confirmed state.
+
+**REJECT** (Advanced)
+A query for a restaurant `SID` to reject a reservation request `RID`.
+
+- Input
+
+  ```plain
+  REJECT {SID} {RID}
+  ```
+
+  - `REJECT`: A string `REJECT`
+  - `SID`: Restaurant ID
+  - `RID`: Reservation ID
+
+- Output
+  The following conditions are checked from the top, and the process corresponding to the first condition that applies is executed.
+  - If a reservation ID does not exist or the reservation request `RID` is not for the restaurant `SID`, print
+  ```plain
+  Error: No such reservation ID
+  ```
+  - If the state of this reservation request `RID` is rejected, print
+  ```plain
+  Error: Already rejected
+  ```
+  - If the state of this reservation request `RID` is confirmed, print
+  ```plain
+  Error: Already confirmed
+  ```
+  - If the state of this reservation request `RID` is cancelled, print
+  ```plain
+  Error: Already cancelled
+  ```
+  - otherwise
+    - Print `to:{UID} {RID} has been rejected` to inform the user `UID` that the reservation request has been rejected. Note that the user `UID` must be the person who sent the reservation request `RID`.
+  - After this, the reservation request `RID` will be considered to be rejected.
+
+**STOP** (Advanced)
+A query for a restaurant `SID` to temporarily stop receiving reservation requests to make a reservation for the specified date and time range. Such requests automatically fail with an error.
+
+- Input
+
+  ```plain
+  STOP {SID} {Date} {Time range}
+  ```
+
+  - `STOP`: A string `STOP`
+  - `SID`: Restaurant ID
+  - `Date`: Date to suspend reservations. An integer between \\(1\\) and \\(3000\\) inclusive.
+  - `Time range`: Time range to suspend reservations on the date
+
+- Outputs
+  The following conditions are checked in order from the top, and the process corresponding to the first condition that applies is executed.
+  - If a non-existent restaurant ID is specified, print
+  ```plain
+  Error: No such restaurant
+  ```
+  - If the reservation stop date is before the current date, print
+  ```plain
+  Error: Specify a date today or after today
+  ```
+  - If the reservation stop date is before day \\(B\\) of the current date, it has already been determined that the reservation cannot be made in that time period due to the limits of the reservation period, so print
+  ```plain
+  Error: Cannot make a reservation already due to being outside the reservation period
+  ```
+  - otherwise
+    - The reservation stop period is set to the date entered.
+
+### Other queries
+
+**NEXT_DAY** (Basic, Advanced)
+A query to inform the system that the current business day is over. This query adds \\(1\\) to the current date. In addition, all pending reservation requests that will expire due to the date change are changed to the rejected state.
+
+- Input
+
+  ```plain
+  NEXT_DAY
+  ```
+
+  - `NEXT_DAY`: A string `NEXT_DAY`
+
+- Output
+  - Add \\(1\\) to the current date.
+  - Iterate all the pending reservation requests, in ascending lexical order of reservation IDs, and do the following for each
+    - If a reservation request expires due to the date change, do the following
+      - Change the reservation request to the rejected state.
+      - Print `to:{UID} {RID} has been auto-rejected` to inform the user `UID` (specified in the reservation request) that the reservation request `RID` has been rejected automatically due to there being no response from the restaurant.
+
+**LIST** (Advanced)
+A query to list a new restaurant in the system.
+
+- input
+  ```plain
+  LIST
+  {Restaurant Information}
+  ```
+  - `LIST`: A string `LIST`.
+  - The restaurant information follows the eight-line format already described.
+  - The restaurant ID of a restaurant being added through the LIST query will not be the same as that of an existing restaurant in the system.
+- Output
+  - None.
+  - Treat the given restaurant as existing in the system after this query.
+
+**REMOVE** (Advanced)
+A query to remove a restaurant `SID` from the system.
+
+- Input
+  ```plain
+  REMOVE {SID}
+  ```
+  - `REMOVE`: A string `REMOVE`
+  - `SID`: Restaurant ID
+- Output
+  - If the restaurant `SID` exists, the restaurant with the specified restaurant ID is treated as no longer existing.
+  - Otherwise, print
+  ```plain
+  Error: No such restaurant
+  ```
+
+## Input and Output Examples
+
+### Example 1
+
+Standard input ([CONFIRM1-2-basic.in](test/in/basic/CONFIRM1-2-basic.in))
+
+```plain
+1
+Mac contact@mac.x.yz 3 2 2 8
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+REQUEST s3iv5 Joe Mac 4 15:30 4
+CONFIRM Mac s3iv5
+CONFIRM Mac s3iv5
+```
+
+Standard output
+
+```plain
+to:Mac Received a reservation request: s3iv5 Joe 4 15:30 4
+to:Joe s3iv5 has been confirmed
+Error: Already confirmed
+```
+
+There is only one restaurant listed in the system, `Mac`, and it is open 24/7. \\(3\\) queries are given following the restaurant information.
+
+- First, the user `Joe` sends a reservation request to the restaurant `Mac` to make a reservation for \\(4\\) people on Day \\(4\\) at `15:30`. The reservation ID is `s3iv5` and is pending.
+- The restaurant `Mac` confirms the pending reservation request `s3iv5`. This reservation request has been placed in the confirmed state.
+- The restaurant `Mac` attempts to confirm the reservation request `s3iv5` again. As this reservation request is already in the confirmed state, an error will be output.
+
+This test case is a basic test case.
+
+### Example 2
+
+Standard input ([NEXT_DAY2-2-basic.in](test/in/basic/NEXT_DAY2-2-basic.in))
+
+```plain
+1
+Mac contact@mac.x.yz 3 2 2 8
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+00:00-24:00
+REQUEST bbb Joe Mac 4 15:30 2
+REQUEST aaa Joe Mac 4 15:30 2
+REQUEST ccc Joe Mac 4 15:30 2
+NEXT_DAY
+NEXT_DAY
+```
+
+Standard output
+
+```plain
+to:Mac Received a reservation request: bbb Joe 4 15:30 2
+to:Mac Received a reservation request: aaa Joe 4 15:30 2
+to:Mac Received a reservation request: ccc Joe 4 15:30 2
+to:Joe aaa has been auto-rejected
+to:Joe bbb has been auto-rejected
+to:Joe ccc has been auto-rejected
+```
+
+There is only one restaurant listed in the system, `Mac`, and it is open 24/7. \\(5\\) queries are given following the restaurant information.
+
+- First, the user `Joe` sends three reservation requests to the restaurant `Mac` to make a reservation for \\(2\\) people on Day \\(4\\) at `15:30`. All the reservation requests `aaa`, `bbb`, and `ccc` are in the pending state. These requests are supposed to be confirmed or rejected by the restaurant by the end of the next business day (Day 2). If the restaurant misses the due date, the requests will automatically be rejected by the system.
+- Since `NEXT_DAY` is given twice, the system is informed that it is Day 3. At this moment, all reservation requests will be automatically rejected by the system.
+
+This test case is a basic test case.
+
+### Example 3
+
+Standard input ([30_all-1.in](test/in/basic/30_all-1.in))
+
+```plain
+2
+ssbelyo contact@ulcqp.xyz 6 2 5 7
+07:32-13:37
+-
+00:08-07:12 07:49-08:01 22:09-22:20
+00:06-01:42 04:27-06:52 12:09-22:05
+01:21-01:55 02:13-02:52 05:21-07:29 10:04-17:14
+15:37-18:09
+00:58-01:40 07:40-08:45 12:19-15:41 19:46-19:54
+ssqteaj contact@adozl.xyz 5 3 7 9
+04:06-04:34 06:36-10:36
+21:58-22:44
+-
+02:21-07:22 07:32-15:54 17:49-18:02 20:09-23:18
+02:08-12:55
+01:05-14:54
+00:29-02:33 10:04-20:00
+NEXT_DAY
+CONFIRM aajjo czuvq
+LIST
+ssafuyd contact@kpwff.xyz 7 2 9 10
+08:10-10:16 13:31-20:07
+00:34-05:04 13:14-14:15
+02:35-04:36 10:36-18:16
+00:09-01:13 02:28-18:16
+00:21-02:52 07:58-10:33 10:37-13:21 15:01-19:25
+08:29-14:23
+00:39-01:18 10:18-12:32 14:54-15:28 16:40-17:36
+REQUEST rrysjmo uuxcqgo ssqteaj 6 10:19 7
+STOP ssqteaj 6 05:41-18:45
+LIST
+ssgljcj contact@brmji.xyz 8 7 5 6
+02:44-09:39 14:21-18:39
+03:56-05:29 08:23-11:01 12:29-15:43 19:39-21:55
+00:47-03:44 10:33-12:27 15:56-19:16
+01:11-16:54 16:58-20:45
+-
+-
+01:06-05:53 06:27-11:17 15:33-18:30 22:04-23:34
+STOP ssbelyo 3 04:11-11:22
+REJECT ssqteaj rrysjmo
+NEXT_DAY
+CONFIRM kqisk zkggp
+REQUEST rrwbynf uukxxvo ssafuyd 10 14:07 10
+STOP ssbelyo 6 03:59-05:18
+STOP ssbelyo 6 06:08-19:16
+CONFIRM ssafuyd rrwbynf
+CANCEL uukxxvo rrwbynf
+```
+
+Standard output
+
+```plain
+Error: No such reservation ID
+to:ssqteaj Received a reservation request: rrysjmo uuxcqgo 6 10:19 7
+Error: Cannot make a reservation already due to being outside the reservation period
+to:uuxcqgo rrysjmo has been rejected
+Error: No such reservation ID
+to:ssafuyd Received a reservation request: rrwbynf uukxxvo 10 14:07 10
+to:uukxxvo rrwbynf has been confirmed
+to:ssafuyd rrwbynf has been cancelled
+```
+
+Note that the expected I/O is defined in [test/basic_testcases.json](test/basic_testcases.json). Please refer to this file for implementation.
+
+```Javascript
+[
+   {
+      "input": "in/basic/30_all-1.in",
+      "output": "out/basic/30_all-1.out",
+      "description": "[応用実装] 初期店舗数が 2 でクエリ数が 15 である場合に正答できる (クエリの種類: CANCEL CONFIRM LIST NEXT_DAY REJECT REQUEST STOP)",
+      "description_en": "[Advanced] Correct when the number of initial restaurants is 2 and the number of given queries is 15  (Query types: CANCEL CONFIRM LIST NEXT_DAY REJECT REQUEST STOP)"
+   },
+   {
+      "input": "in/basic/CONFIRM1-2-basic.in",
+      "output": "out/basic/CONFIRM1-2-basic.out",
+      "description": "[基本実装] 初期店舗数が 1 でクエリ数が 3 である場合に正答できる (クエリの種類: CONFIRM REQUEST)",
+      "description_en": "[Basic] Correct when the number of initial restaurants is 1 and the number of given queries is 3  (Query types: CONFIRM REQUEST)"
+   },
+   {
+      "input": "in/basic/NEXT_DAY2-2-basic.in",
+      "output": "out/basic/NEXT_DAY2-2-basic.out",
+      "description": "[基本実装] 初期店舗数が 1 でクエリ数が 5 である場合に正答できる (クエリの種類: NEXT_DAY REQUEST)",
+      "description_en": "[Basic] Correct when the number of initial restaurants is 1 and the number of given queries is 5  (Query types: NEXT_DAY REQUEST)"
+   },
+   {
+      "input": "in/basic/NEXT_DAY2.in",
+      "output": "out/basic/NEXT_DAY2.out",
+      "description": "[応用実装] 初期店舗数が 1 でクエリ数が 7 である場合に正答できる (クエリの種類: NEXT_DAY REQUEST)",
+      "description_en": "[Advanced] Correct when the number of initial restaurants is 1 and the number of given queries is 7  (Query types: NEXT_DAY REQUEST)"
+   },
+   {
+      "input": "in/basic/REMOVE1-2.in",
+      "output": "out/basic/REMOVE1-2.out",
+      "description": "[応用実装] 初期店舗数が 1 でクエリ数が 3 である場合に正答できる (クエリの種類: REMOVE REQUEST)",
+      "description_en": "[Advanced] Correct when the number of initial restaurants is 1 and the number of given queries is 3  (Query types: REMOVE REQUEST)"
+   }
+]
+```
+
+### Given
+
+```JavaScript
+<?php namespace Track;
+ini_set("memory_limit", -1);
+
+function main($lines) {
+  foreach ($lines as $index=>$value) {
+    printf("line[%s]: %s\n", $index, $value);
+  }
+}
+
+$array = array();
+while (true) {
+  $stdin = fgets(STDIN);
+  if ($stdin == "") {
+    break;
+  }
+  $array[] = rtrim($stdin);
+}
+main($array);
+```
+
+### Question
+
+### Answer
+
+#### First Test
+
+```JavaScript
+<?php
+class RestaurantReservationSystem
+{
+    private $restaurants = [];
+    private $current_date = 1; // Initialize current date to 1
+
+    // Function to add a restaurant to the system
+    public function addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours)
+    {
+        $this->restaurants[$restaurant_id] = [
+            'contact_info' => $contact_info,
+            'reservation_period' => $reservation_period,
+            'min_people' => $min_people,
+            'max_people' => $max_people,
+            'business_hours' => $business_hours,
+            'reservations' => [] // Initialize reservations for this restaurant
+        ];
+    }
+    function calculateReservationPeriod($A, $B, $reservationDate)
+    {
+        // Calculate the starting date of the acceptable reservation period
+        $startingDate = $reservationDate - $A;
+
+        // Calculate the ending date of the acceptable reservation period
+        $endingDate = $reservationDate - $B;
+
+        // Return the starting and ending dates as an array
+        return [$startingDate, $endingDate];
+    }
+
+    // Function to handle a reservation request
+    public function handleReservationRequest($reservation_id, $user_id, $restaurant_id, $date, $time, $num_people)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurant_id])) {
+            echo "Error: No such restaurant\n";
+            return;
+        }
+
+        // Retrieve restaurant information
+        $restaurant = $this->restaurants[$restaurant_id];
+        $reservation_period_start = $restaurant['reservation_period'][0];
+        $reservation_period_end = $restaurant['reservation_period'][1];
+        $min_people = $restaurant['min_people'];
+        $max_people = $restaurant['max_people'];
+
+        // Calculate the earliest and latest reservation dates allowed
+        $reservationPeriod = $this->calculateReservationPeriod($reservation_period_start, $reservation_period_end, $date);
+        // Check if the current date is within the reservation period
+        if (!in_array($this->current_date,$reservationPeriod)) {
+            echo "Error: Outside of reservation period\n";
+            return;
+        }
+
+        // Check if the time falls within business hours
+        $business_hours = $restaurant['business_hours'][$date];
+        $time_within_hours = false;
+        $reservation_time = strtotime($time);
+        // echo "Reserve Time: {$time} \n";
+        // print_r($business_hours);
+        // foreach ($business_hours as $key=>$hours) {
+        //     $start_time = strtotime($hours[0]);
+        //     $end_time = strtotime($hours[1]);
+        //     echo "Start Time: {$start_time} \n";
+        //     echo "End Time: {$end_time} \n";
+        //     echo "hours: \n";
+        //     print_r($hours);
+        //     if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+        //         $time_within_hours = true;
+        //         break;
+        //     }
+        // }
+        $start_time = strtotime($business_hours[0]);
+        $end_time = strtotime($business_hours[1]);
+        if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+            $time_within_hours = true;
+        }
+
+        if (!$time_within_hours) {
+            echo "Error: Outside of business hours\n";
+            return;
+        }
+
+        // Check if the number of people falls within the allowed range
+        if ($num_people < $min_people || $num_people > $max_people) {
+            echo "Error: Too many or too few people\n";
+            return;
+        }
+        // Register reservation
+        $reservationData = ['id'=>$reservation_id,'user_id'=>$user_id,'date'=>$date,'time'=>$time,'people'=>$num_people,'status'=>'Pending'];
+        $this->restaurants[$restaurant_id]['reservations'][$reservation_id] = $reservationData;
+        echo "Prepared reservation: \n";
+        print_r($reservationData);
+        echo 'Updated restaurant \n';
+        print_r($this->restaurants[$restaurant_id]); // Print the updated restaurant
+
+        // Reservation request is valid, notify the restaurant
+        echo "to:$restaurant_id Received a reservation request: $reservation_id $user_id $date $time $num_people\n";
+    }
+
+    // Function to confirm a reservation request
+    public function confirmReservation($restaurantID, $reservationID)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurantID])) {
+            printf("Error: No such restaurant\n");
+            return;
+        }
+        echo "Restaurant ID param: {$restaurantID} \n";
+        echo "Reservation ID param: {$reservationID} \n";
+        // print_r($this->restaurants[$restaurantID]);
+        // Check if the reservation ID exists for the specified restaurant
+        if (!isset($this->restaurants[$restaurantID]['reservations'][$reservationID])) {
+            printf("Error: No such reservation ID\n");
+            return;
+        }
+
+        // Get the reservation request
+        $reservation = $this->restaurants[$restaurantID]['reservations'][$reservationID];
+
+        // Check if the reservation request is already confirmed
+        if ($reservation['status'] === "Confirmed") {
+            printf("Error: Already confirmed\n");
+            return;
+        }
+
+        // Confirm the reservation request
+        $this->restaurants[$restaurantID]['reservations'][$reservationID]['status'] = "Confirmed";
+        printf("to:%s %s has been confirmed\n", $reservationID, $restaurantID);
+    }
+}
+
+// Sample input
+$input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST s3iv5 Joe Mac 4 15:30 4\nCONFIRM Mac s3iv5\nCONFIRM Mac s3iv5\n";
+
+// Explode input into lines
+$lines = explode("\n", $input);
+
+// Create a new instance of RestaurantReservationSystem
+$system = new RestaurantReservationSystem();
+
+// Parse restaurant information
+$restaurant_info = explode(" ", $lines[1]);
+$restaurant_id = $restaurant_info[0];
+$contact_info = $restaurant_info[1];
+$reservation_period = [$restaurant_info[2], $restaurant_info[3]];
+$min_people = $restaurant_info[4];
+$max_people = $restaurant_info[5];
+$business_hours = [];
+for ($i = 2; $i <= 8; $i++) {
+    $hours = explode("-", $lines[$i]);
+    // print_r($hours);
+    // echo "Start--- {$hours[0]} \n";
+    // echo "end--- {$hours[1]} \n";
+    $business_hours[] = [$hours[0], $hours[1]]; // Add the start and end times as an array
+}
+// print_r($business_hours);
+
+// Add restaurant to the system
+$system->addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours);
+
+// Parse and handle queries
+for ($i = 9; $i < count($lines) - 1; $i++) {
+    $query = explode(" ", $lines[$i]);
+    if ($query[0] == "REQUEST") {
+        // echo "RID Param:" . $query[1] . "\n";
+        // echo "UID Param:" . $query[2] . "\n";
+        // echo "RESID Param:" . $query[3] . "\n";
+        // echo "Date Param:" . $query[4] . "\n";
+        // echo "Time Param:" . $query[5] . "\n";
+        $system->handleReservationRequest($query[1], $query[2], $query[3], $query[4], $query[5], $query[6]);
+    } elseif ($query[0] == "CONFIRM") {
+        $system->confirmReservation($query[1], $query[2]); // Use index 2 for restaurant ID
+    }
+}
+```
+
+### Second TestCase
+
+```JavaScript
+<?php
+class RestaurantReservationSystem
+{
+    private $restaurants = [];
+    private $current_date = 1; // Initialize current date to 1
+
+    // Function to add a restaurant to the system
+    public function addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours)
+    {
+        $this->restaurants[$restaurant_id] = [
+            'contact_info' => $contact_info,
+            'reservation_period' => $reservation_period,
+            'min_people' => $min_people,
+            'max_people' => $max_people,
+            'business_hours' => $business_hours,
+            'reservations' => [] // Initialize reservations for this restaurant
+        ];
+    }
+    function calculateReservationPeriod($A, $B, $reservationDate)
+    {
+        // Calculate the starting date of the acceptable reservation period
+        $startingDate = $reservationDate - $A;
+
+        // Calculate the ending date of the acceptable reservation period
+        $endingDate = $reservationDate - $B;
+
+        // Return the starting and ending dates as an array
+        return [$startingDate, $endingDate];
+    }
+
+    // Function to handle a reservation request
+    public function handleReservationRequest($reservation_id, $user_id, $restaurant_id, $date, $time, $num_people)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurant_id])) {
+            echo "Error: No such restaurant\n";
+            return;
+        }
+
+        // Retrieve restaurant information
+        $restaurant = $this->restaurants[$restaurant_id];
+        $reservation_period_start = $restaurant['reservation_period'][0];
+        $reservation_period_end = $restaurant['reservation_period'][1];
+        $min_people = $restaurant['min_people'];
+        $max_people = $restaurant['max_people'];
+
+        // Calculate the earliest and latest reservation dates allowed
+        $reservationPeriod = $this->calculateReservationPeriod($reservation_period_start, $reservation_period_end, $date);
+        // Check if the current date is within the reservation period
+        // echo "Current Date: {$this->current_date} \n";
+        // print_r($reservationPeriod);
+        if (!in_array($this->current_date,$reservationPeriod)) {
+            echo "Error: Outside of reservation period\n";
+            return;
+        }
+
+        // Check if the time falls within business hours
+        $business_hours = $restaurant['business_hours'][$date];
+        $time_within_hours = false;
+        $reservation_time = strtotime($time);
+        // echo "Reserve Time: {$time} \n";
+        // print_r($business_hours);
+        // foreach ($business_hours as $key=>$hours) {
+        //     $start_time = strtotime($hours[0]);
+        //     $end_time = strtotime($hours[1]);
+        //     echo "Start Time: {$start_time} \n";
+        //     echo "End Time: {$end_time} \n";
+        //     echo "hours: \n";
+        //     print_r($hours);
+        //     if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+        //         $time_within_hours = true;
+        //         break;
+        //     }
+        // }
+        $start_time = strtotime($business_hours[0]);
+        $end_time = strtotime($business_hours[1]);
+        if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+            $time_within_hours = true;
+        }
+
+        if (!$time_within_hours) {
+            echo "Error: Outside of business hours\n";
+            return;
+        }
+
+        // Check if the number of people falls within the allowed range
+        if ($num_people < $min_people || $num_people > $max_people) {
+            echo "Error: Too many or too few people\n";
+            return;
+        }
+        // Register reservation
+        $reservationData = ['id'=>$reservation_id,'user_id'=>$user_id,'date'=>$date,'time'=>$time,'people'=>$num_people,'status'=>'Pending'];
+        $this->restaurants[$restaurant_id]['reservations'][$reservation_id] = $reservationData;
+        // echo "Prepared reservation: \n";
+        // print_r($reservationData);
+        // echo "Updated restaurant \n";
+        // print_r($this->restaurants[$restaurant_id]); // Print the updated restaurant
+
+        // Reservation request is valid, notify the restaurant
+        echo "to:$restaurant_id Received a reservation request: $reservation_id $user_id $date $time $num_people\n";
+    }
+
+    // Function to confirm a reservation request
+    public function confirmReservation($restaurantID, $reservationID)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurantID])) {
+            printf("Error: No such restaurant\n");
+            return;
+        }
+        // echo "Restaurant ID param: {$restaurantID} \n";
+        // echo "Reservation ID param: {$reservationID} \n";
+        // print_r($this->restaurants[$restaurantID]);
+        // Check if the reservation ID exists for the specified restaurant
+        if (!isset($this->restaurants[$restaurantID]['reservations'][$reservationID])) {
+            printf("Error: No such reservation ID\n");
+            return;
+        }
+
+        // Get the reservation request
+        $reservation = $this->restaurants[$restaurantID]['reservations'][$reservationID];
+
+        // Check if the reservation request is already confirmed
+        if ($reservation['status'] === "Confirmed") {
+            printf("Error: Already confirmed\n");
+            return;
+        }
+
+        // Confirm the reservation request
+        $this->restaurants[$restaurantID]['reservations'][$reservationID]['status'] = "Confirmed";
+        // printf("to:%s %s has been confirmed\n", $reservationID, $restaurantID);
+        printf("to:%s %s has been confirmed\n", $reservation['user_id'], $reservationID); // Print the correct user ID
+    }
+    public function handleNextDay()
+    {
+        $this->current_date++;
+        foreach($this->restaurants as $restaurant_id=>$restaurant_data) {
+            ksort($restaurant_data['reservations']);
+            foreach($restaurant_data['reservations'] as $reservation_id=> $reservation_data) {
+                if($reservation_data['status'] =='Pending') {
+                    $validPeriod = $this->calculateReservationPeriod($restaurant_data['reservation_period'][0], $restaurant_data['reservation_period'][1],$reservation_data['date']);
+                    if (!in_array($this->current_date, $validPeriod)) {
+                        echo "to:{$reservation_data['user_id']} {$reservation_id} has been auto-rejected\n";
+                        unset($this->restaurants[$restaurant_id]['reservations'][$reservation_id]);
+                        // return;
+                    }
+                }
+            }
+        }
+        // echo "Updated reservations \n";
+        // print_r($this->restaurants[$restaurant_id]);
+    }
+}
+
+// Sample input
+$input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST s3iv5 Joe Mac 4 15:30 4\nCONFIRM Mac s3iv5\nCONFIRM Mac s3iv5\n";
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST bbb Joe Mac 4 15:30 2\nREQUEST aaa Joe Mac 4 15:30 2\nREQUEST ccc Joe Mac 4 15:30 2\nNEXT_DAY\nNEXT_DAY\n";
+
+// Explode input into lines
+$lines = explode("\n", $input);
+
+// Create a new instance of RestaurantReservationSystem
+$system = new RestaurantReservationSystem();
+
+// Parse restaurant information
+$restaurant_info = explode(" ", $lines[1]);
+$restaurant_id = $restaurant_info[0];
+$contact_info = $restaurant_info[1];
+$reservation_period = [$restaurant_info[2], $restaurant_info[3]];
+$min_people = $restaurant_info[4];
+$max_people = $restaurant_info[5];
+$business_hours = [];
+for ($i = 2; $i <= 8; $i++) {
+    $hours = explode("-", $lines[$i]);
+    // print_r($hours);
+    // echo "Start--- {$hours[0]} \n";
+    // echo "end--- {$hours[1]} \n";
+    $business_hours[] = [$hours[0], $hours[1]]; // Add the start and end times as an array
+}
+// print_r($business_hours);
+
+// Add restaurant to the system
+$system->addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours);
+
+// Parse and handle queries
+for ($i = 9; $i < count($lines) - 1; $i++) {
+    $query = explode(" ", $lines[$i]);
+    if ($query[0] == "REQUEST") {
+        // echo "RID Param:" . $query[1] . "\n";
+        // echo "UID Param:" . $query[2] . "\n";
+        // echo "RESID Param:" . $query[3] . "\n";
+        // echo "Date Param:" . $query[4] . "\n";
+        // echo "Time Param:" . $query[5] . "\n";
+        $system->handleReservationRequest($query[1], $query[2], $query[3], $query[4], $query[5], $query[6]);
+    } elseif ($query[0] == "CONFIRM") {
+        $system->confirmReservation($query[1], $query[2]); // Use index 2 for restaurant ID
+    }else if($query[0]== "NEXT_DAY") {
+        $system->handleNextDay();
+    }
+}
+```
+
+### Third Testcase
+
+```JavaScript
+<?php
+class RestaurantReservationSystem
+{
+    private $restaurants = [];
+    private $current_date = 1; // Initialize current date to 1
+
+    // Function to add a restaurant to the system
+    public function addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours)
+    {
+        $this->restaurants[$restaurant_id] = [
+            'contact_info' => $contact_info,
+            'reservation_period' => $reservation_period,
+            'min_people' => $min_people,
+            'max_people' => $max_people,
+            'business_hours' => $business_hours,
+            'reservations' => [] // Initialize reservations for this restaurant
+        ];
+    }
+    function calculateReservationPeriod($A, $B, $reservationDate)
+    {
+        // Calculate the starting date of the acceptable reservation period
+        $startingDate = $reservationDate - $A;
+
+        // Calculate the ending date of the acceptable reservation period
+        $endingDate = $reservationDate - $B;
+
+        // Return the starting and ending dates as an array
+        return [$startingDate, $endingDate];
+    }
+
+    // Function to handle a reservation request
+    public function handleReservationRequest($reservation_id, $user_id, $restaurant_id, $date, $time, $num_people)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurant_id])) {
+            echo "Error: No such restaurant\n";
+            return;
+        }
+
+        // Retrieve restaurant information
+        $restaurant = $this->restaurants[$restaurant_id];
+        $reservation_period_start = $restaurant['reservation_period'][0];
+        $reservation_period_end = $restaurant['reservation_period'][1];
+        $min_people = $restaurant['min_people'];
+        $max_people = $restaurant['max_people'];
+
+        // Calculate the earliest and latest reservation dates allowed
+        $reservationPeriod = $this->calculateReservationPeriod($reservation_period_start, $reservation_period_end, $date);
+        // Check if the current date is within the reservation period
+        if (!in_array($this->current_date,$reservationPeriod)) {
+            echo "Error: Outside of reservation period\n";
+            return;
+        }
+
+        // Check if the time falls within business hours
+        $business_hours = $restaurant['business_hours'][$date-1];
+        $time_within_hours = false;
+        $reservation_time = strtotime($time);
+        // echo "Reserve Time: {$time} \n";
+        // print_r($business_hours);
+        // foreach ($business_hours as $key=>$hours) {
+        //     $start_time = strtotime($hours[0]);
+        //     $end_time = strtotime($hours[1]);
+        //     echo "Start Time: {$start_time} \n";
+        //     echo "End Time: {$end_time} \n";
+        //     echo "hours: \n";
+        //     print_r($hours);
+        //     if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+        //         $time_within_hours = true;
+        //         break;
+        //     }
+        // }
+        // echo "BusinessHours: \n";
+        // print_r($restaurant['business_hours']);
+        $start_time = strtotime($business_hours[0]);
+        $end_time = strtotime($business_hours[1]);
+        if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+            $time_within_hours = true;
+        }
+
+        if (!$time_within_hours) {
+            echo "Error: Outside of business hours\n";
+            return;
+        }
+
+        // Check if the number of people falls within the allowed range
+        if ($num_people < $min_people || $num_people > $max_people) {
+            echo "Error: Too many or too few people\n";
+            return;
+        }
+        // Register reservation
+        $reservationData = ['id'=>$reservation_id,'user_id'=>$user_id,'date'=>$date,'time'=>$time,'people'=>$num_people,'status'=>'Pending'];
+        $this->restaurants[$restaurant_id]['reservations'][$reservation_id] = $reservationData;
+        // echo "Prepared reservation: \n";
+        // print_r($reservationData);
+        // echo "Updated restaurant \n";
+        // print_r($this->restaurants[$restaurant_id]); // Print the updated restaurant
+
+        // Reservation request is valid, notify the restaurant
+        echo "to:$restaurant_id Received a reservation request: $reservation_id $user_id $date $time $num_people\n";
+    }
+
+    // Function to confirm a reservation request
+    public function confirmReservation($restaurantID, $reservationID)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurantID])) {
+            printf("Error: No such restaurant\n");
+            return;
+        }
+        // echo "Restaurant ID param: {$restaurantID} \n";
+        // echo "Reservation ID param: {$reservationID} \n";
+        // print_r($this->restaurants[$restaurantID]);
+        // Check if the reservation ID exists for the specified restaurant
+        if (!isset($this->restaurants[$restaurantID]['reservations'][$reservationID])) {
+            printf("Error: No such reservation ID\n");
+            return;
+        }
+
+        // Get the reservation request
+        $reservation = $this->restaurants[$restaurantID]['reservations'][$reservationID];
+
+        // Check if the reservation request is already confirmed
+        if ($reservation['status'] === "Confirmed") {
+            printf("Error: Already confirmed\n");
+            return;
+        }
+
+        // Confirm the reservation request
+        $this->restaurants[$restaurantID]['reservations'][$reservationID]['status'] = "Confirmed";
+        // printf("to:%s %s has been confirmed\n", $reservationID, $restaurantID);
+        printf("to:%s %s has been confirmed\n", $reservation['user_id'], $reservationID); // Print the correct user ID
+    }
+    public function handleNextDay()
+    {
+        $this->current_date++;
+        foreach($this->restaurants as $restaurant_id=>$restaurant_data) {
+            ksort($restaurant_data['reservations']);
+            foreach($restaurant_data['reservations'] as $reservation_id=> $reservation_data) {
+                if($reservation_data['status'] =='Pending') {
+                    $validPeriod = $this->calculateReservationPeriod($restaurant_data['reservation_period'][0], $restaurant_data['reservation_period'][1],$reservation_data['date']);
+                    if (!in_array($this->current_date, $validPeriod)) {
+                        echo "to:{$reservation_data['user_id']} {$reservation_id} has been auto-rejected\n";
+                        unset($this->restaurants[$restaurant_id]['reservations'][$reservation_id]);
+                        // return;
+                    }
+                }
+            }
+        }
+        // echo "Updated reservations \n";
+        // print_r($this->restaurants[$restaurant_id]);
+    }
+}
+
+// Sample input
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST s3iv5 Joe Mac 4 15:30 4\nCONFIRM Mac s3iv5\nCONFIRM Mac s3iv5\n";
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST bbb Joe Mac 4 15:30 2\nREQUEST aaa Joe Mac 4 15:30 2\nREQUEST ccc Joe Mac 4 15:30 2\nNEXT_DAY\nNEXT_DAY\n";
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n-\n-\n-\n15:00-16:00\n-\n-\n-\nREQUEST bbb Joe Mac 4 15:30 2\nREQUEST aaa Joe Mac 4 15:30 2\nREQUEST ccc Joe Mac 4 15:30 2\nNEXT_DAY\nNEXT_DAY\nNEXT_DAY\nNEXT_DAY";
+
+// Explode input into lines
+$lines = explode("\n", $input);
+
+// Create a new instance of RestaurantReservationSystem
+$system = new RestaurantReservationSystem();
+
+// Parse restaurant information
+$restaurant_info = explode(" ", $lines[1]);
+$restaurant_id = $restaurant_info[0];
+$contact_info = $restaurant_info[1];
+$reservation_period = [$restaurant_info[2], $restaurant_info[3]];
+$min_people = $restaurant_info[4];
+$max_people = $restaurant_info[5];
+$business_hours = [];
+for ($i = 2; $i <= 8; $i++) {
+    $hours = explode("-", $lines[$i]);
+    // print_r($hours);
+    // echo "Start--- {$hours[0]} \n";
+    // echo "end--- {$hours[1]} \n";
+    $business_hours[] = [$hours[0], $hours[1]]; // Add the start and end times as an array
+}
+// print_r($business_hours);
+
+// Add restaurant to the system
+$system->addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours);
+
+// Parse and handle queries
+for ($i = 9; $i < count($lines) - 1; $i++) {
+    $query = explode(" ", $lines[$i]);
+    if ($query[0] == "REQUEST") {
+        // echo "RID Param:" . $query[1] . "\n";
+        // echo "UID Param:" . $query[2] . "\n";
+        // echo "RESID Param:" . $query[3] . "\n";
+        // echo "Date Param:" . $query[4] . "\n";
+        // echo "Time Param:" . $query[5] . "\n";
+        $system->handleReservationRequest($query[1], $query[2], $query[3], $query[4], $query[5], $query[6]);
+    } elseif ($query[0] == "CONFIRM") {
+        $system->confirmReservation($query[1], $query[2]); // Use index 2 for restaurant ID
+    }else if($query[0]== "NEXT_DAY") {
+        $system->handleNextDay();
+    }
+}
+
+```
+
+### All Basic Queries
+
+```JavaScript
+<?php
+class RestaurantReservationSystem
+{
+    private $restaurants = [];
+    private $current_date = 1; // Initialize current date to 1
+
+    // Function to add a restaurant to the system
+    public function addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours)
+    {
+        $this->restaurants[$restaurant_id] = [
+            'contact_info' => $contact_info,
+            'reservation_period' => $reservation_period,
+            'min_people' => $min_people,
+            'max_people' => $max_people,
+            'business_hours' => $business_hours,
+            'reservations' => [] // Initialize reservations for this restaurant
+        ];
+    }
+    function calculateReservationPeriod($A, $B, $reservationDate)
+    {
+        // Calculate the starting date of the acceptable reservation period
+        $startingDate = $reservationDate - $A;
+
+        // Calculate the ending date of the acceptable reservation period
+        $endingDate = $reservationDate - $B;
+
+        // Return the starting and ending dates as an array
+        return [$startingDate, $endingDate];
+    }
+
+    // Function to handle a reservation request
+    public function handleReservationRequest($reservation_id, $user_id, $restaurant_id, $date, $time, $num_people)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurant_id])) {
+            echo "Error: No such restaurant\n";
+            return;
+        }
+
+        // Retrieve restaurant information
+        $restaurant = $this->restaurants[$restaurant_id];
+        $reservation_period_start = $restaurant['reservation_period'][0];
+        $reservation_period_end = $restaurant['reservation_period'][1];
+        $min_people = $restaurant['min_people'];
+        $max_people = $restaurant['max_people'];
+
+        // Calculate the earliest and latest reservation dates allowed
+        $reservationPeriod = $this->calculateReservationPeriod($reservation_period_start, $reservation_period_end, $date);
+        // Check if the current date is within the reservation period
+        if (!in_array($this->current_date,$reservationPeriod)) {
+            echo "Error: Outside of reservation period\n";
+            return;
+        }
+
+        // Check if the time falls within business hours
+        $business_hours = $restaurant['business_hours'][$date-1];
+        $time_within_hours = false;
+        $reservation_time = strtotime($time);
+        // echo "Reserve Time: {$time} \n";
+        // print_r($business_hours);
+        // foreach ($business_hours as $key=>$hours) {
+        //     $start_time = strtotime($hours[0]);
+        //     $end_time = strtotime($hours[1]);
+        //     echo "Start Time: {$start_time} \n";
+        //     echo "End Time: {$end_time} \n";
+        //     echo "hours: \n";
+        //     print_r($hours);
+        //     if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+        //         $time_within_hours = true;
+        //         break;
+        //     }
+        // }
+        // echo "BusinessHours: \n";
+        // print_r($restaurant['business_hours']);
+        $start_time = strtotime($business_hours[0]);
+        $end_time = strtotime($business_hours[1]);
+        if ($reservation_time >= $start_time && $reservation_time < $end_time) {
+            $time_within_hours = true;
+        }
+
+        if (!$time_within_hours) {
+            echo "Error: Outside of business hours\n";
+            return;
+        }
+
+        // Check if the number of people falls within the allowed range
+        if ($num_people < $min_people || $num_people > $max_people) {
+            echo "Error: Too many or too few people\n";
+            return;
+        }
+        // Register reservation
+        $reservationData = ['id'=>$reservation_id,'user_id'=>$user_id,'date'=>$date,'time'=>$time,'people'=>$num_people,'status'=>'Pending'];
+        $this->restaurants[$restaurant_id]['reservations'][$reservation_id] = $reservationData;
+        // echo "Prepared reservation: \n";
+        // print_r($reservationData);
+        // echo "Updated restaurant \n";
+        // print_r($this->restaurants[$restaurant_id]); // Print the updated restaurant
+
+        // Reservation request is valid, notify the restaurant
+        echo "to:$restaurant_id Received a reservation request: $reservation_id $user_id $date $time $num_people\n";
+    }
+
+    // Function to confirm a reservation request
+    public function confirmReservation($restaurantID, $reservationID)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurantID])) {
+            printf("Error: No such restaurant\n");
+            return;
+        }
+        // echo "Restaurant ID param: {$restaurantID} \n";
+        // echo "Reservation ID param: {$reservationID} \n";
+        // print_r($this->restaurants[$restaurantID]);
+        // Check if the reservation ID exists for the specified restaurant
+        if (!isset($this->restaurants[$restaurantID]['reservations'][$reservationID])) {
+            printf("Error: No such reservation ID\n");
+            return;
+        }
+
+        // Get the reservation request
+        $reservation = $this->restaurants[$restaurantID]['reservations'][$reservationID];
+        // echo "Confirm for {$reservationID} \n";
+        // print_r($reservation);
+        // Check if the reservation request is already confirmed
+        if ($reservation['status'] === "Confirmed") {
+            printf("Error: Already confirmed\n");
+            return;
+        }
+
+        // Confirm the reservation request
+        $this->restaurants[$restaurantID]['reservations'][$reservationID]['status'] = "Confirmed";
+        // printf("to:%s %s has been confirmed\n", $reservationID, $restaurantID);
+        printf("to:%s %s has been confirmed\n", $reservation['user_id'], $reservationID); // Print the correct user ID
+    }
+    public function handleNextDay()
+    {
+        $this->current_date++;
+        foreach($this->restaurants as $restaurant_id=>$restaurant_data) {
+            ksort($restaurant_data['reservations']);
+            foreach($restaurant_data['reservations'] as $reservation_id=> $reservation_data) {
+                if($reservation_data['status'] =='Pending') {
+                    $validPeriod = $this->calculateReservationPeriod($restaurant_data['reservation_period'][0], $restaurant_data['reservation_period'][1],$reservation_data['date']);
+                    if (!in_array($this->current_date, $validPeriod)) {
+                        echo "to:{$reservation_data['user_id']} {$reservation_id} has been auto-rejected\n";
+                        unset($this->restaurants[$restaurant_id]['reservations'][$reservation_id]);
+                        // return;
+                    }
+                }
+            }
+        }
+        // echo "Updated reservations \n";
+        // print_r($this->restaurants[$restaurant_id]);
+    }
+    // Function to remove a restaurant
+    public function removeRestaurant($restaurantID)
+    {
+        // Check if the restaurant exists
+        if (!isset($this->restaurants[$restaurantID])) {
+            printf("Error: No such restaurant\n");
+            return;
+        }
+
+        // Remove the restaurant
+        unset($this->restaurants[$restaurantID]);
+        // printf("Restaurant %s has been removed\n", $restaurantID);
+    }
+
+}
+
+// Sample input
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST s3iv5 Joe Mac 4 15:30 4\nCONFIRM Mac s3iv5\nCONFIRM Mac s3iv5\n";
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST bbb Joe Mac 4 15:30 2\nREQUEST aaa Joe Mac 4 15:30 2\nREQUEST ccc Joe Mac 4 15:30 2\nNEXT_DAY\nNEXT_DAY\n";
+// NEXT_DAY2.in
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n-\n-\n-\n15:00-16:00\n-\n-\n-\nREQUEST bbb Joe Mac 4 15:30 2\nREQUEST aaa Joe Mac 4 15:30 2\nREQUEST ccc Joe Mac 4 15:30 2\nNEXT_DAY\nNEXT_DAY\nNEXT_DAY\nNEXT_DAY";
+// REMOVE-2.in
+// $input = "1\nMac contact@mac.x.yz 3 2 2 8\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\n00:00-24:00\nREQUEST aaa Joe Mac 4 15:30 2\nREMOVE Mac\nREMOVE Mac";
+
+// Explode input into lines
+// $lines = explode("\n", $input);
+
+// // Create a new instance of RestaurantReservationSystem
+// $system = new RestaurantReservationSystem();
+
+// // Parse restaurant information
+// $restaurant_info = explode(" ", $lines[1]);
+// $restaurant_id = $restaurant_info[0];
+// $contact_info = $restaurant_info[1];
+// $reservation_period = [$restaurant_info[2], $restaurant_info[3]];
+// $min_people = $restaurant_info[4];
+// $max_people = $restaurant_info[5];
+// $business_hours = [];
+// for ($i = 2; $i <= 8; $i++) {
+//     $hours = explode("-", $lines[$i]);
+//     // print_r($hours);
+//     // echo "Start--- {$hours[0]} \n";
+//     // echo "end--- {$hours[1]} \n";
+//     $business_hours[] = [$hours[0], $hours[1]]; // Add the start and end times as an array
+// }
+// // print_r($business_hours);
+
+// // Add restaurant to the system
+// $system->addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours);
+
+// Parse and handle queries
+// for ($i = 9; $i < count($lines) - 1; $i++) {
+//     $query = explode(" ", $lines[$i]);
+//     if ($query[0] == "REQUEST") {
+//         // echo "RID Param:" . $query[1] . "\n";
+//         // echo "UID Param:" . $query[2] . "\n";
+//         // echo "RESID Param:" . $query[3] . "\n";
+//         // echo "Date Param:" . $query[4] . "\n";
+//         // echo "Time Param:" . $query[5] . "\n";
+//         $system->handleReservationRequest($query[1], $query[2], $query[3], $query[4], $query[5], $query[6]);
+//     } elseif ($query[0] == "CONFIRM") {
+//         $system->confirmReservation($query[1], $query[2]); // Use index 2 for restaurant ID
+//     }else if($query[0]== "NEXT_DAY") {
+//         $system->handleNextDay();
+//     }else if($query[0]== "REMOVE") {
+//         $system->removeRestaurant($query[1]);
+//     }
+// }
+
+function main($array,$system)
+{
+    $system = new RestaurantReservationSystem();
+
+// Explode input into lines
+$lines = $array;
+
+// Create a new instance of RestaurantReservationSystem
+
+
+// Parse restaurant information
+$restaurant_info = explode(" ", $lines[1]);
+$restaurant_id = $restaurant_info[0];
+$contact_info = $restaurant_info[1];
+$reservation_period = [$restaurant_info[2], $restaurant_info[3]];
+$min_people = $restaurant_info[4];
+$max_people = $restaurant_info[5];
+$business_hours = [];
+for ($i = 2; $i <= 8; $i++) {
+    $hours = explode("-", $lines[$i]);
+    // print_r($hours);
+    // echo "Start--- {$hours[0]} \n";
+    // echo "end--- {$hours[1]} \n";
+    $business_hours[] = [$hours[0], $hours[1]]; // Add the start and end times as an array
+}
+// print_r($business_hours);
+
+// Add restaurant to the system
+$system->addRestaurant($restaurant_id, $contact_info, $reservation_period, $min_people, $max_people, $business_hours);
+
+// Parse and handle queries
+// for ($i = 9; $i < count($lines) - 1; $i++) {
+//     $query = explode(" ", $lines[$i]);
+//     if ($query[0] == "REQUEST") {
+//         // echo "RID Param:" . $query[1] . "\n";
+//         // echo "UID Param:" . $query[2] . "\n";
+//         // echo "RESID Param:" . $query[3] . "\n";
+//         // echo "Date Param:" . $query[4] . "\n";
+//         // echo "Time Param:" . $query[5] . "\n";
+//         $system->handleReservationRequest($query[1], $query[2], $query[3], $query[4], $query[5], $query[6]);
+//     } elseif ($query[0] == "CONFIRM") {
+//         echo "Entering to confirm with RID {$query[1]} and RSID {$query[1]}";
+//         $system->confirmReservation($query[1], $query[2]); // Use index 2 for restaurant ID
+//     }else if($query[0]== "NEXT_DAY") {
+//         $system->handleNextDay();
+//     }else if($query[0]== "REMOVE") {
+//         $system->removeRestaurant($query[1]);
+//     }
+// }
+    $queries = array_slice($lines, 9);
+    $index = 0;
+    // echo "Queries: \n";
+    // print_r($queries);
+    while ($index < count($queries)) {
+        $query = explode(" ", $queries[$index]);
+        if ($query[0] == "REQUEST") {
+            $system->handleReservationRequest($query[1], $query[2], $query[3], $query[4], $query[5], $query[6]);
+        } elseif ($query[0] == "CONFIRM") {
+            // echo "Entering to confirm with RID {$query[1]} and RSID {$query[1]}";
+            $system->confirmReservation($query[1], $query[2]); // Use index 2 for restaurant ID
+        } else if ($query[0] == "NEXT_DAY") {
+            $system->handleNextDay();
+        } else if ($query[0] == "REMOVE") {
+            $system->removeRestaurant($query[1]);
+        }
+        $index++;
+    }
+
+}
+
+$array = array();
+while (true) {
+    $stdin = fgets(STDIN);
+    if ($stdin == "") {
+        break;
+    }
+    $array[] = rtrim($stdin);
+}
+$system = new RestaurantReservationSystem();
+main($array,$system);
+```
+
+## To Rework NEXT_DAY query
+
+- iterate only pending reservations accending of reservation id.
+- Not delete the request just to change status to Rejected
+
+## REQUEST query
+
+- Error: Reservations temporarily closed
+
+```Javascript
+The sendReservationRequest method within the User class is responsible for initiating a reservation request. Let's compare it with the confirmReservationRequest method in the Restaurant class:
+
+Responsibility:
+
+sendReservationRequest (User): This method is responsible for initiating a reservation request on behalf of a user. It takes the necessary parameters for the reservation (such as restaurant ID, date, time, and number of people) and delegates the actual sending of the request to the ReservationService.
+confirmReservationRequest (Restaurant): This method is responsible for confirming a reservation request. It receives a reservation ID and checks if the corresponding reservation request exists and if it's in a pending state. If so, it updates the status of the reservation request to "Confirmed".
+Interactions:
+
+sendReservationRequest (User): Interacts with the ReservationService to send the reservation request to the system. It doesn't directly manipulate reservation data but delegates the task to another service.
+confirmReservationRequest (Restaurant): Interacts directly with the stored reservation requests within the System. It accesses and updates the status of a specific reservation request based on its ID.
+Dependency:
+
+sendReservationRequest (User): Relies on an instance of ReservationServiceInterface (usually implemented by ReservationService) for sending reservation requests. It's injected into the User class via dependency injection.
+confirmReservationRequest (Restaurant): Operates within the context of the Restaurant class and accesses reservation requests stored within the System. It doesn't rely on external dependencies beyond the System instance.
+Action:
+
+sendReservationRequest (User): Initiates a new reservation request by providing the necessary details. It doesn't directly modify the state of existing reservation data but triggers the creation of new reservation requests.
+confirmReservationRequest (Restaurant): Updates the status of an existing reservation request to "Confirmed". It directly modifies the state of reservation data stored within the System.
+In summary, while both methods are involved in the reservation process, they have distinct responsibilities and interact with different components of the system. The sendReservationRequest method initiates new reservation requests, while the confirmReservationRequest method confirms existing pending reservation requests.
+```

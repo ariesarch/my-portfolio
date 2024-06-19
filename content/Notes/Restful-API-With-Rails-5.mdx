@@ -1,0 +1,139 @@
+---
+title: Restful API with Rails5 Udemy Course
+description: Restful API with Rails5 Udemy Course
+published: true
+category: notes
+date: 2024-12-04
+---
+
+# Installation 
+
+```
+rails new rails_api
+```
+
+# Creating User Model and Authentication 
+
+In Gemfile
+```
+gem 'devise', '~> 4.9.2'
+```
+
+## [Auth Gem] (https://github.com/heartcombo/devise/blob/main/lib/devise/models/database_authenticatable.rb)
+```
+bundle install 
+rails generate devise:install 
+rails generate devise User
+rails db:migrate
+```
+
+## [Simple Authentication] (https://github.com/gonzalo-bulnes/simple_token_authentication)
+
+```
+gem 'simple_token_authentication', '~> 1.0' # see semver.org
+```
+
+
+```
+rails g migration add_authentication_token_to_users "authentication_token:string{30}:uniq"
+rake db:migrate
+rails c 
+User.column_names
+```
+
+## [Status code] (https://gist.github.com/mlanett/a31c340b132ddefa9cca)
+
+# Registration 
+
+## RegistrationController
+
+```Ruby
+class Api::V1::RegistrationController < Devise::RegistrationController
+  before_action: ensure_params_exist, only: create
+  # sign up
+  def create
+    user = User.new user_params
+    if user.save 
+      json_response "Sign Up Successfully", true, {user: user}, :ok
+    else 
+      json_response "Something wrong", false, {}, :unprocessable_entity
+    end
+  end
+
+  private 
+  def user_params
+    params.require(:user).permit(:email,:password,:password_confirmation)
+  end
+
+  def ensure_params_exist
+    return if params[:user].present?
+    json_response "Missing params",false,{}, :bad_reqeust
+    if @user 
+      return @user
+    else
+      json_response "Cannot find user", false, {}, :failure
+    end
+  end
+
+end
+
+```
+
+## Response 
+
+```Ruby 
+module Response 
+    def json_response message,is_success,data,status 
+        render json: {
+            message: message,
+            is_success: is_success,
+            data: data 
+        }, status: status
+    end
+```
+
+## SessionController (Sign In) 
+
+```Ruby 
+class Api::V1::SessionController < Devise::SessionController
+    before_action :sign_in_params, only: create 
+    before_action :load_user, only:create 
+    # sign in
+    def create 
+        if @user.valid_password?(sign_in_params[:password]) 
+            signin "user", @user 
+            json_response "Sign In Sucessfully", true, {user: @user}, :ok
+        else
+            json_response "Unauthorized", false, {}, :unauthorized
+        end
+    end
+
+    private
+    def sign_in_params
+        params.require(:sign_in).permit(:email,:password)
+    end
+
+    def load_user
+        @user = User.find_for_database_authentication(email: sign_in_params[:email]) 
+    end
+end
+```
+
+## Route 
+
+```Ruby 
+Rails.application.routes.draw do
+  devise_for :users
+  namespace :api, defaults:{format: :json} do
+    namespace :v1 do
+      # get 'registration/index'
+      devise_scope:user do 
+        post "sign_up", to: "registration#create"
+        post "sign_in", to: "session#create"
+      end
+    end
+  end
+end
+```
+
+## Actiive Model Serializer (https://github.com/rails-api/active_model_serializers)

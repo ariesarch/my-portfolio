@@ -6,11 +6,11 @@ import { motion } from "framer-motion";
 // import Avatar from "../components/Avatar";
 import { fadeIn } from "@/utils/variants"; 
 import { Intro } from "../organisms/Intro/Intro";
-import { Container } from "../Container";
+import { BaseContainer } from "../BaseContainer";
 import { Neurons } from "../atoms/Neurons";
 export const Home = ()=> {
     return (
-        <Container className="flex flex-col xl:flex-row gap-x-1">
+        <BaseContainer className="flex flex-col xl:flex-row gap-x-1">
             <div className="w-full h-screen">
                 <motion.div
                     variants={fadeIn("up", 0.5)}
@@ -65,6 +65,6 @@ export const Home = ()=> {
             {/* <div className="z-3 absolute bottom-2 right-2 h-full w-max">
                 <Neurons />
             </div> */}
-        </Container>
+        </BaseContainer>
     );
 }

@@ -7,7 +7,7 @@ export function getSidebarItems(
   const result: NavItem[] = [];
   for (const item of items) {
     if ("items" in item) {
-      console.log("main items", item)
+      // console.log("main items", item)
       // Category
       result.push({
         ...item,
@@ -24,6 +24,6 @@ export function getSidebarItems(
       });
     }
   }
-  console.log("Result: ", result)
+  // console.log("Result: ", result)
   return result;
 }

@@ -32,7 +32,7 @@ import {
     SiMongodb
 } from "react-icons/si";
 import CountUp from 'react-countup';
-import { Container } from '@/components/Container';
+import { BaseContainer } from '@/components/BaseContainer';
 import ExperienceItem from '@/components/atoms/ExperienceItem';
 import { AboutData } from '@/utils/constants';
 import { Neurons } from '@/components/atoms/Neurons';
@@ -46,7 +46,7 @@ export const aboutData: AboutData[] = [
                 title: "Software Development Manager -BinaryLab",
                 stage: "2022-Now",
                 description: "Led and harmonized diverse development teams across Mobile, Front-end, and Back-end projects. Actively engaged in all development stages, from Mobile to Back-end, blending managerial finesse with technical prowess. Orchestrated client interactions, guided the SDLC, and fostered seamless communication. Managed rigorous code reviews, intricate refactoring, and QA processes, ensuring top-notch standards. Demonstrated adeptness in both leadership and technical depth, ensuring project success at every juncture.",
-                stacks: ['HTML&CSS', 'Tailwind', 'Bootstrap', 'Emotion', 'JavaScript', 'JQuery', 'Vue', 'Nuxt.js', 'React', 'Next.js', 'Alpine.js', 'ReactNative', 'React Query', 'PHP', 'Laravel', 'Filament', 'Livewire', 'MySQL', 'PostgreSQL', 'Redis', 'Ubuntu', 'Docker', 'AWS', 'Github Actions', 'Jenkins', 'Kubernetes'],
+                stacks: ['HTML&CSS', 'Tailwind', 'Bootstrap', 'Emotion', 'JavaScript', 'JQuery', 'Vue', 'Nuxt.js', 'React', 'Next.js', 'Alpine.js', 'ReactNative', 'React Query','Ruby','Rubo on Rails', 'PHP', 'Laravel', 'Filament', 'Livewire', 'MySQL', 'PostgreSQL', 'Redis', 'Ubuntu', 'Docker', 'AWS', 'Github Actions', 'Jenkins', 'Kubernetes'],
                 href:"https://www.binarylab.io"
             },
             {
@@ -163,7 +163,7 @@ export const About = ()=>{
     
     const [index,setIndex] = useState(0)
     return (
-        <Container className="flex flex-col xl:flex-row gap-2 ">
+        <BaseContainer className="flex flex-col xl:flex-row gap-2 ">
                 
                 {/* text */}
                 <div className="flex flex-col w-full relative">
@@ -261,6 +261,6 @@ export const About = ()=>{
                     ))}
                 </div>
             </motion.div>
-        </Container>
+        </BaseContainer>
     );
 }

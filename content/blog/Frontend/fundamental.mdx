@@ -1,0 +1,139 @@
+---
+title: Event Loop
+description: Event Loop
+published: true
+category: frontend
+date: 2023-12-05
+---
+
+
+[JavaScript Theory]:(https://github.com/abhideepghosh/JavaScript-Theory)
+
+
+1. JavaScript dynamic type language: variables တွေရဲ့ data type တွေကို runtime မှာပဲ သိမြင် ဆုံးဖြတ်ပါတယ်။
+
+```Javascript
+// Example with TypeScript (static typing)
+let variable1: number = 10; // variable1 is explicitly declared as a number
+console.log(typeof variable1); // Output: number
+
+// Trying to assign a string to variable1 will result in a compile-time error
+// variable1 = "Hello"; // Error: Type '"Hello"' is not assignable to type 'number'
+
+// Example with JavaScript (dynamic typing)
+let variable2 = 10; // variable2 is inferred as a number
+console.log(typeof variable2); // Output: number
+
+variable2 = "Hello"; // Now variable2 is dynamically changed to a string
+console.log(typeof variable2); // Output: string
+
+// TypeScript enforces type checking at compile time, preventing type errors like this:
+// variable2 = "Hello"; // Error: Type '"Hello"' is not assignable to type 'number'
+
+// Example with TypeScript (static typing) in function parameters
+function add(x: number, y: number): number {
+    return x + y;
+}
+
+console.log(add(5, 3)); // Output: 8 (addition of two numbers)
+// TypeScript catches type errors at compile time
+// console.log(add("5", "3")); // Error: Argument of type '"5"' is not assignable to parameter of type 'number'
+
+// Example with JavaScript (dynamic typing) in function parameters
+function addDynamic(x, y) {
+    return x + y;
+}
+
+console.log(addDynamic(5, 3)); // Output: 8 (addition of two numbers)
+console.log(addDynamic("5", "3")); // Output: "53" (concatenation of two strings)
+
+// TypeScript can catch potential errors like this at compile time
+// console.log(addDynamic("5", "3")); // Output: "53" (concatenation of two strings)
+
+```
+
+2. First-Class Citizens: JavaScript မှာ function တွေကိုလည်း တခြား string,array,boolean တို့လို data type တွေလိုပဲ သတ်မှတ်ထားပါတယ်။ 
+ဒါကြောင့် function တခုကို variable ထဲ assign လုပ်ပေးလို့ရပါတယ်။ 
+data structure ထဲမှာလည်း function တွေကို သိမ်းဆည်းနိုင်ပါတယ်။
+function တခုကို တခြား function ကိုခေါ်သုံးရာမှာ parameter အဖြစ်လည်းထည့်ပေးလို့ရသလို function တခုကနေ နောက်ထပ် function တခုကို return လုပ်ပေးလို့ရပါတယ်။
+
+```JavaScript
+### Assigning functions to variables:
+const add = function (a, b) {
+    return a + b;
+};
+
+console.log(add(2, 3)); // Output: 5
+```
+
+```JavaScript
+### Storing functions in data structures:
+const operations = {
+    add: function (a, b) {
+        return a + b;
+    },
+    subtract: function (a, b) {
+        return a - b;
+    }
+};
+console.log(operations.add(5, 3)); // Output: 8
+console.log(operations.subtract(5, 3)); // Output: 2
+```
+
+```JavaScript
+### Passing functions as arguments:
+function greet(name) {
+    console.log('Hello, ' + name + '!');
+}
+
+function processGreeting(callback) {
+    callback('John');
+}
+
+processGreeting(greet); // Output: Hello, John!
+```
+
+```JavaScript
+### Returning functions from functions:
+function createMultiplier(factor) {
+    return function (number) {
+        return number * factor;
+    };
+}
+
+const double = createMultiplier(2);
+console.log(double(5)); // Output: 10
+```
+
+
+### 1. Variable Scope Management
+Variable scope management is critical in JavaScript because it ensures that variables are accessible only within their appropriate scopes, preventing unintended conflicts and promoting code clarity and modularity. Here's a detailed explanation of why and how variable scope management is important in the context of execution in JavaScript:
+
+1. Preventing Variable Collisions:
+
+1.1. Explanation: Each execution context in JavaScript has its own variable environment, which contains variables, function declarations, and arguments scoped to that context. This ensures that variables declared within a specific scope do not conflict with variables of the same name in other parts of the code.
+1.2. Example: If a variable named count is declared within a function, it will not conflict with another variable named count declared in a different function or global scope. This prevents unintended side effects and makes code more maintainable.
+
+2. Encapsulation and Modularity:
+
+2.1. Explanation: Proper variable scoping allows for encapsulation and modularity in JavaScript code. Variables declared within a function are only accessible within that function's scope, encapsulating their behavior and preventing them from affecting other parts of the code.
+2.2. Example: Encapsulating variables within functions helps in creating reusable and modular code. Functions can be treated as black boxes, with their internal variables hidden from the outside world, promoting code abstraction and reducing complexity.
+
+3. Avoiding Global Namespace Pollution:
+
+3.1. Explanation: Without proper variable scoping, variables declared in the global scope can unintentionally overwrite or be overwritten by variables from different parts of the code. This can lead to namespace pollution and conflicts, making code difficult to understand and maintain.
+3.2. Example: If multiple scripts declare variables in the global scope with common names like data or result, they may inadvertently interfere with each other's functionality. Proper scoping confines variables to their respective execution contexts, mitigating the risk of namespace pollution.
+
+4. Closure and Function-Level Scope:
+
+4.1. Explanation: JavaScript's function-level scope allows for the creation of closures, which are functions that have access to variables from their enclosing scope even after the enclosing function has finished executing. Proper variable scoping is essential for creating and maintaining closures.
+4.2. Example: In a closure, an inner function retains access to variables from its outer function's scope, even after the outer function has returned. This enables powerful programming patterns like memoization, currying, and maintaining state in event handlers.
+
+5. Improved Code Readability and Debugging:
+
+5.1. Explanation: Well-defined variable scopes improve code readability by making it clear where variables are declared and how they are accessed within the code. This facilitates easier debugging and troubleshooting, as developers can quickly identify where variables are defined and determine their intended scope.
+5.2. Example: By following best practices for variable scoping, such as avoiding global variables and using block-level scope introduced by let and const, developers can write code that is easier to understand, debug, and maintain.
+
+In summary, proper variable scope management in JavaScript ensures that variables are scoped appropriately, preventing conflicts, promoting code modularity, encapsulation, and readability, and enabling powerful programming patterns like closures. 
+Understanding and mastering variable scope is essential for writing clean, maintainable, and bug-free JavaScript code.
+

@@ -1,0 +1,80 @@
+---
+title: Data Structure
+description: Data Structure
+published: true
+category: interview
+date: 2023-12-05
+---
+
+
+## Data Structure 
+
+### Array 
+
+An array is a sequential arrangement of elements of the same data type, stored in contigous memory locations.
+It is an ordered collection that confers constant time access to individual element and efficient memory usage.
+Arrays are fundamental for various purposes such as searching,sorting,storing,enabling quick and efficient data retrieval.
+[Ref:](https://www.geeksforgeeks.org/10-most-important-data-structures-for-coding-interviews/)
+
+
+### Stack (LIFO)
+In JavaScript, a stack is a data structure that follows the Last-In, First-Out (LIFO) principle. This means that the last element added to the stack will be the first one to be removed. Think of it like a stack of plates where you can only add or remove plates from the top.
+ဖဲဝိုင်းမှာ ဖဲဝေတဲ့ ပုံနဲ့တူပါတယ်။
+```JavaScript
+class Stack {
+  constructor() {
+    this.items = [];
+  }
+
+  // Push element onto the stack
+  push(element) {
+    this.items.push(element);
+  }
+
+  // Pop element from the stack
+  pop() {
+    if (this.isEmpty()) {
+      return "Underflow";
+    }
+    return this.items.pop();
+  }
+
+  // Peek at the top element of the stack
+  peek() {
+    return this.items[this.items.length - 1];
+  }
+
+  // Check if the stack is empty
+  isEmpty() {
+    return this.items.length === 0;
+  }
+
+  // Get the size of the stack
+  size() {
+    return this.items.length;
+  }
+}
+```
+
+```JavaScript
+let stack = new Stack();
+stack.push(10);
+stack.push(20);
+stack.push(30);
+
+console.log(stack.peek()); // Output: 30
+console.log(stack.pop()); // Output: 30
+console.log(stack.pop()); // Output: 20
+console.log(stack.size()); // Output: 1
+console.log(stack.isEmpty()); // Output: false
+
+```
+[Ref:] (https://github.com/trekhleb/javascript-algorithms?tab=readme-ov-file)
+
+### Linked List 
+ချိန်းကြိုးနဲ့တူတယ်။ တခုနဲ့တခုချိတ်ထားတယ်။​ 
+Singleby : အဆစ်နှစ်ခုကြားမှာ တခုထည့်ချင်ရင် ရှေ့ကအဆစ်ကို မှတ်ပြီးကိုင်ထား ထည့်မယ့်အဆစ်ကို နောက်ကအဆစ်နဲ့ ဆက် ပြီးရင် ရှေ့ကအဆစ်နဲ့ပြန်ဆက်။
+Doubly: နောက်က အဆစ်ကနေ ထည့်မယ်အဆစ်ကို လာဆက်ပြီးမှ ရှေ့ကအဆစ်ကိုဆက်လည်းရတယ်။
+
+
+### Queue(FIFO)

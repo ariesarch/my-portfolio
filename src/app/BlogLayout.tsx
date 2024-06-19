@@ -6,7 +6,7 @@ import "./styles/prism.css"; // Syntax highlight
 // import Navbar from '@/components/common/Navbar'
 import "./styles/globals.css"
 import GroupSidebar from '@/components/molecules/GroupSidebar';
-import { Container } from '@/components/Container';
+import { BlogContainer } from '@/components/BlogContainer';
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -20,11 +20,11 @@ export default function BlogLayout({
     children: React.ReactNode
 }) {
     return (
-        <Container className='mx-auto note-layout lg:grid-cols-5 lg:gap-2 lg:py-16'>
+        <BlogContainer className='mx-auto note-layout lg:grid-cols-5 lg:gap-2 lg:py-16'>
             {/* <div > */}
                 <GroupSidebar />
                 <div className="col-span-4">{children}</div>
             {/* </div> */}
-        </Container>
+        </BlogContainer>
     )
 }

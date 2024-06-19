@@ -1,24 +1,49 @@
 ---
-title: Design Patterns in JavaScript 
-description: Learn Design Patterns in JavaScript
+title: Design Patterns Notes
+description: Learn Design Patterns
 published: true
 category: design pattern
 date: 2023-12-05
 ---
 
-## Builder Pattern 
+1. Interviewer: "Could you define what a design pattern is?"
+- Candidate: "Sure, A design pattern is a general solution to solve common common problems in the software development process.It's like an architectural blueprints for software.
+Just as architects use blueprints to guide the construction of buildings, developers use design patterns to guide the construction of software systems."
+
+2. Interviewer: "I see. So, it's about providing a plan or structure for building software?"
+- Candidate: "Exactly! Design patterns offer a set of solution to common problems encountered in software development. They help us organize our code in a way that efficient,maintainable and scalable."
+
+3. Interviewer: "That makes sense. Can you give an example of a common problem that a design pattern might solve?"
+- Candidate: "Sure! Let's consider the Singleton design pattern. In my case, we need to ensure that a class has only one instance and provide a global access point to that instance. This is a common problem, especially scenarios where we need to manage the shared resources or configurations across our application."
+
+4. Interviewer: "Interesting. And how does the Singleton pattern address this problem?"
+- Candidate: "The Singleton pattern ensures that a class has only one instance by providing a mechanism for creating and accessing that instance globally.
+This ensures that all parts of the application share the same instance of the class avoiding the issues such as inconsistent state or unnecessary resource consumption."
+
+5. Interviewer: "Could you provide another example to help us understand design patterns better?"
+- Candidate: "Absolutely! Let's consider the Observer design pattern.Imaging, you're building the weather application which need to display the real-time updates to users whenever the weather changes. 
+The observer pattern allows us to establish one-to-many relationship between the weather data and UI element.
+Each UI element subscribes to the weather data, and when there's a change, it's notified automatically. 
+This decouples the weather data from the UI components, making our code more flexible and easier to maintain."."
+# What are the advantages of using design patterns?
+- 
+# What are the different categories of design patterns?
+
+1.  
+# Builder Pattern 
 
 A creational design pattern which separates the construction layer of complex objects from its representation layer, allowing same construction process for different representations.
 It's particularly help when you might have multiple representations of an object,or when you want to encapsulate the creation logic separate from the main application.
 The factory pattern is also used to create objects, however it doesn't matter how they are created.
 The factory pattern is concerned with the result while the builder pattern not only gets the result but also participates in the specific process of object creation, which is suitable for creating complex compound objects.
 
-### Diagram
+## Diagram
 ![Function](/blog/design-pattern/builder-function.png)
 **Function**
 ![Class](/blog/design-pattern/builder-class.png)
 **Class**
 
+## JavaScript Examples
 ```javascript
 class House {
     constructor(){
@@ -70,6 +95,7 @@ console.log(WoodenHouse)
 
 
 ```javascript
+// Builder Interface/Abstract Class
 class FastFoodBuilder {
     addBread(){}
     addSauce(){}
