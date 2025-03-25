@@ -179,7 +179,7 @@ var getAge = function (yearOfBirth) {
 };
 ```
 
-### 2. Creation of the Scope Change 
+### 2. Creation of the Scope Chain 
 
 ဒီအဆင့်မှာတော့ ဘယ် variables,functions တွေဟာ ဘယ်နေရာကနေ အသုံးပြုလို့ရတယ်ဆိုတာ သတ်မှတ်ပါတယ်။ 
 JavaScript first-class citizen ရှိတာကြောင့် function တွေကို invoke လုပ်တဲ့အခါ ဆိုင်ရာအလိုက် လုပ်ဆောင်သွားဖို့ အတွက် scope ကို သတ်မှတ်ပေးရပါတယ်။
@@ -206,6 +206,5 @@ Scope Chain ဆိုတာကတော့ ဒီိလို scope တွေရ
 second အထဲမှာ greeting variable ကိုခေါ်သုံးထားပါတယ်။ 
 သူက second function အထဲမှာ ကြေငြာမထားတဲ့ variable ဖြစ်ပါတယ်။ 
 ဒီအချိန်မှာ JavaScript Engine က greeting ကို second အထဲမှာ ရှိသလား အရင်ရှာပါတယ်။မရှိပါဘူး။
-ဒီတော့ second ရဲ့ outer function first ထဲမှာ ထပ်ကြည့်ပါတယ်။ မရှိပါဘူး။
+ဒီတော့ second ရဲ့ outer function first ထဲမှာ ထပ်ကြည့်ပါတယ်။ မရှိပါဘူး။x
 ဒီတခါတော့ Global Scope ထဲမှာ ထပ်ရှာပါတယ်။ အဲဒီမှာ တွေ့တဲ့ variable ကို access လုပ်ပြီး သုံးလိုက်တာပါ။
-
